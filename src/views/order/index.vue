@@ -1,4 +1,5 @@
 <template>
+  <!-- 我的订单页面 -->
   <div class="order flex flex--row">
     <!-- tab切换 -->
     <div class="order_tab flex flex--align-items--center">
@@ -35,7 +36,7 @@
 </template>
 
 <script>
-import orderList from './components/orderList.vue'
+import orderList from '@/components/orderList.vue'
 export default {
   name: 'Order',
   components: {

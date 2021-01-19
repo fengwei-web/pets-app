@@ -3,7 +3,6 @@
     <div class="order_list_head flex flex--align-items--center flex--justify-content--space-between">
       <div class="order_list_head_left flex flex--align-items--center">
         <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" />
-        <!-- <img src="../../../../static/ceshi/dianpu_pic.png" /> -->
         <p>Panda宠物馆</p>
       </div>
       <span>待付款</span>
@@ -38,11 +37,12 @@
           </div>
         </div>
       </div>
-
       <div class="order_list_box_actual_payment flex flex--justify-content--end">实付款：￥199.00</div>
     </div>
-
-    <div class="order_list_foot flex flex--align-items--center flex--justify-content--end">
+    <div
+      class="order_list_foot flex flex--align-items--center flex--justify-content--end"
+      v-if="type == 'order'"
+    >
       <!-- <div class="order_list_foot_term">取消订单</div>
       <div class="order_list_foot_term">去付款</div>
       <div class="order_list_foot_term">申请退款</div> -->
@@ -51,13 +51,26 @@
       <div class="order_list_foot_term">确认收货</div>
       <div class="order_list_foot_term">去评价</div>
     </div>
-
+    <div
+      class="order_list_foot flex flex--align-items--center flex--justify-content--end"
+      v-else
+    >
+      <div class="shopOrder_list_foot_term">查看</div>
+      <div class="shopOrder_list_foot_term">发货</div>
+      <div class="shopOrder_list_foot_term">退款</div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'OrderList',
+  props: {
+    type: {
+      type: String,
+      default: 'order'
+    }
+  },
   data () {
     return {}
   },
@@ -148,6 +161,18 @@ export default {
       border-top: 1px solid #DEDEDE;
       .order_list_foot_term{
         padding: 7px;
+        box-sizing: border-box;
+        border: 1px solid #949cdf;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #949CDF;
+        margin-right: 9px;
+        &:last-of-type{
+          margin-right: 0;
+        }
+      }
+      .shopOrder_list_foot_term{
+        padding: 7px 19px;
         box-sizing: border-box;
         border: 1px solid #949cdf;
         border-radius: 4px;
