@@ -32,6 +32,24 @@ const routes = [
     name: 'viewLogistics',
     component: () => import('../views/order/viewLogistics')
   },
+  // 提交订单
+  {
+    path: '/order/submit',
+    name: 'submitOrder',
+    component: () => import('../views/order/submitOrder')
+  },
+  // 订单支付
+  {
+    path: '/order/payment',
+    name: 'orderPayment',
+    component: () => import('../views/order/orderPayment')
+  },
+  // 支付结果
+  {
+    path: '/order/result',
+    name: 'orderResult',
+    component: () => import('../views/order/orderResult')
+  },
   // 商家订单列表
   {
     path: '/shopOrder',
