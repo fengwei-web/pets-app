@@ -2,29 +2,69 @@
   <div class="coupon">
     <div
       class="coupon_list flex flex--align-items--center flex--justify-content--space-between"
-      v-for="item in 10"
-      :key="item"
+      v-for="(item,index) in couponList"
+      :key="index"
     >
       <div class="coupon_list_price flex flex--align-items--end">
-        <p><b>¥</b>10<b>.00</b></p>
+        <p><b>¥</b>{{ item.price.split('.')[0] }}<b>.{{ item.price.split('.')[1] }}</b></p>
       </div>
       <div class="coupon_list_info flex flex--row">
-        <h3>砍价优惠劵</h3>
-        <p>2019.03.01-2019.04.30</p>
-        <span>适用于服务</span>
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.start_time }}-{{ item.end_time }}</p>
+        <span>{{ item.desc }}</span>
       </div>
       <van-button
         class="coupon_list_state"
         round
         type="info"
-      >使用</van-button>
+      >{{ item.user_status === 0 ? '立即领取': ''  }}</van-button>
+    </div>
+    <div class="coupon_title">我的优惠卷</div>
+    <div
+      class="coupon_list flex flex--align-items--center flex--justify-content--space-between"
+      v-for="(item,index) in couponList"
+      :key="index"
+    >
+      <div class="coupon_list_price flex flex--align-items--end">
+        <p><b>¥</b>{{ item.price.split('.')[0] }}<b>.{{ item.price.split('.')[1] }}</b></p>
+      </div>
+      <div class="coupon_list_info flex flex--row">
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.start_time }}-{{ item.end_time }}</p>
+        <span>{{ item.desc }}</span>
+      </div>
+      <van-button
+        class="coupon_list_state"
+        round
+        type="info"
+      >{{ item.user_status === 0 ? '立即领取': ''  }}</van-button>
     </div>
   </div>
 </template>
 
 <script>
+import { getCouponList } from '@/api/coupon.js'
 export default {
-  name: 'couponList'
+  name: 'couponList',
+  data () {
+    return {
+      couponList: [] // 优惠券列表
+    }
+  },
+  created () {
+    this.getCouponList()
+  },
+  methods: {
+    async getCouponList () {
+      const { data } = await getCouponList({ token: '5748c39c8381ad3fd323ba55283cc809cfbebf82' })
+      if (data.status === 1) {
+        this.couponList = data.response_data
+      } else {
+        this.$toast(data.error_msg)
+        setTimeout(() => this.$router.go(-1), 1500)
+      }
+    }
+  }
 }
 </script>
 
@@ -37,7 +77,7 @@ export default {
     .coupon_list{
       height: 96px;
       border: 2px solid #000;
-      padding: 0 21px 0 14px;
+      padding: 0 10px;
       margin-bottom: 11px;
       &:last-of-type{
         margin-bottom: 0;
@@ -80,6 +120,11 @@ export default {
           }
         }
       }
+    }
+    .coupon_title{
+      font-size: 14px;
+      color: #333;
+      padding-bottom: 10px;
     }
   }
 </style>
