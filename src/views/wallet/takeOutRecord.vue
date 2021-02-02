@@ -2,23 +2,46 @@
   <div class="takeOutRecord">
     <div
       class="takeOutRecord_list flex flex--align-items--center flex--justify-content--space-between"
-      v-for="(item,index) in 15"
+      v-for="(item,index) in takeOutList"
       :key="index"
     >
       <div class="takeOutRecord_list_left">
-        <h3>钱包提现</h3>
-        <p>2019-07-01 16:12:12</p>
+        <h3>{{ item.remark }}</h3>
+        <p>{{ item.ctime }}</p>
       </div>
       <div class="takeOutRecord_list_right flex flex--align-items--end">
-        <p>- 7,12</p>
+        <p>- {{ item.amount }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { withdrawalRecord } from '@/api/withdrawal'
 export default {
-  name: 'takeOutRecord'
+  name: 'takeOutRecord',
+  data () {
+    return {
+      page: 1, // 页数
+      limit: 10, // 每页大小
+      takeOutList: [] // 提现记录数据
+    }
+  },
+  created () {
+    this.getWithdrawalRecord()
+  },
+  methods: {
+    async getWithdrawalRecord () {
+      const parame = {
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        page: this.page,
+        limit: this.limit
+      }
+      const { data } = await withdrawalRecord(parame)
+      const { lists } = data.response_data
+      this.takeOutList = lists
+    }
+  }
 }
 </script>
 

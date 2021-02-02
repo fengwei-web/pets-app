@@ -1,32 +1,98 @@
 <template>
   <div class="shopTake">
     <div class="shopTake_head">
-      <h3>当前可提现悬赏金额</h3>
-      <b>333.00</b>
+      <h3>当前可提现金额</h3>
+      <b>{{ money }}</b>
     </div>
     <div class="shopTake_form">
-      <input type="text" placeholder="输入提现金额">
-      <div class="shopTake_form_whole flex flex--justify-content--end">
-        <p>提现全部</p>
+      <input type="number" v-model="amount" placeholder="输入提现金额">
+      <div
+        class="shopTake_form_whole flex flex--justify-content--end"
+      >
+        <p @click="setWholeTake">提现全部</p>
       </div>
       <div class="shopTake_form_options flex flex--justify-content--space-between">
-        <div class="shopTake_form_options_term flex flex--align-items--center flex--justify-content--center">
+        <div
+          class="shopTake_form_options_term flex flex--align-items--center flex--justify-content--center"
+          :class="{shopTake_form_options_term_active: type == 1}"
+          @click="changeType(1)"
+        >
           <i class="icon iconfont icon_weixinzhifu"></i>
           微信支付
         </div>
-        <div class="shopTake_form_options_term flex flex--align-items--center flex--justify-content--center">
+        <div
+          class="shopTake_form_options_term flex flex--align-items--center flex--justify-content--center"
+          :class="{shopTake_form_options_term_active: type == 2}"
+          @click="changeType(2)"
+        >
           <i class="icon iconfont iconzhifubaozhifu" style="color: #1676fd;"></i>
           支付宝支付
         </div>
       </div>
     </div>
-    <van-button class="shopTake_btn" type="info">提交</van-button>
+    <van-button
+      class="shopTake_btn"
+      type="info"
+      @click="setSubmit"
+    >提交</van-button>
   </div>
 </template>
 
 <script>
+import { withdrawDeposit } from '@/api/withdrawal'
 export default {
-  name: 'shopTake'
+  name: 'shopTake',
+  data () {
+    return {
+      money: '', // 可提现金额
+      desc: 1, // 提现类型
+      type: 0, // 提现方式
+      amount: '' // 提现金额
+    }
+  },
+  created () {
+    // 获取参数
+    this.getData()
+  },
+  methods: {
+    // 获取参数
+    getData () {
+      this.money = this.$route.query.money
+      this.desc = this.$route.query.desc
+    },
+    // 提现全部
+    setWholeTake () {
+      this.amount = this.money
+    },
+    // 选择支付方式
+    changeType (type) {
+      this.type = type
+    },
+    // 提交
+    async setSubmit () {
+      if (!this.amount) {
+        this.$toast('请输入金额！')
+        return
+      }
+      if (parseFloat(this.amount) > parseFloat(this.money)) {
+        this.$toast('余额不足！')
+        return
+      }
+      if (!this.type) {
+        this.$toast('请选择提现方式！')
+        return
+      }
+      const parame = {
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        desc: this.desc,
+        type: this.type,
+        amount: this.amount
+      }
+      const { data } = await withdrawDeposit(parame)
+      this.$toast(data.msg)
+      setTimeout(() => this.$router.go(-1), 1500)
+    }
+  }
 }
 </script>
 
@@ -82,6 +148,9 @@ export default {
           font-weight: 500;
           font-family: 微软雅黑;
           color: #333;
+          &.shopTake_form_options_term_active{
+            border: 1px solid #949CDF;
+          }
           i{
             font-size: 30px;
             color: #44cd7c;

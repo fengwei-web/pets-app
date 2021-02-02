@@ -3,7 +3,7 @@
     <div class="takeOut_head flex flex--row flex--justify-content--space-between">
       <div class="takeOut_head_price flex flex--align-items--end">
         <p>¥</p>
-        <span>12</span>
+        <span>{{ userInfo.balance }}</span>
       </div>
       <div class="takeOut_head_tit">我的总收入</div>
     </div>
@@ -11,24 +11,49 @@
       <div class="takeOut_box_list flex flex--align-items--center flex--justify-content--space-between">
         <div class="takeOut_box_list_left">
           <h3>店铺收入</h3>
-          <p>￥30.00</p>
+          <p>￥{{ userInfo.shop_balance }}</p>
         </div>
-        <van-button class="takeOut_box_list_btn" slot="default">提现</van-button>
+        <van-button
+          class="takeOut_box_list_btn"
+          :to="'/wallet/shopTakeOut?money=' + userInfo.shop_balance + '&desc=1'"
+          slot="default"
+        >提现</van-button>
       </div>
       <div class="takeOut_box_list flex flex--align-items--center flex--justify-content--space-between">
         <div class="takeOut_box_list_left">
           <h3>送养收入</h3>
-          <p>￥30.00</p>
+          <p>￥{{ userInfo.send_balance }}</p>
         </div>
-        <van-button class="takeOut_box_list_btn" slot="default">提现</van-button>
+        <van-button
+          class="takeOut_box_list_btn"
+          :to="'/wallet/shopTakeOut?money=' + userInfo.send_balance + '&desc=2'"
+          slot="default"
+        >提现</van-button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { myDetail } from '@/api/withdrawal'
 export default {
-  name: 'takeOut'
+  name: 'takeOut',
+  data () {
+    return {
+      userInfo: {} // 用户个人信息
+    }
+  },
+  created () {
+    // 获取用户个人信息
+    this.getUserInfo()
+  },
+  methods: {
+    // 获取用户个人信息
+    async getUserInfo () {
+      const { data } = await myDetail({ token: '5748c39c8381ad3fd323ba55283cc809cfbebf82' })
+      this.userInfo = data.response_data
+    }
+  }
 }
 </script>
 
