@@ -3,37 +3,42 @@
     <div class="cart_con">
       <div
         class="cart_con_list"
-        v-for="(item,index) in 10"
+        v-for="(item,index) in cartList"
         :key="index"
       >
         <div class="cart_con_list_head flex flex--align-items--center">
-          <img src="../../../static/ceshi/dianpu_pic.png" alt="">
-          <h3>商家名称</h3>
+          <img src="" alt="">
+          <van-image :src="item.shop_info.shop_logo"></van-image>
+          <h3>{{ item.shop_info.shop_name }}</h3>
           <i class="icon iconfont iconyoubianxiaojiantou"></i>
         </div>
 
         <div class="cart_con_list_box">
           <div
             class="cart_con_list_box_term flex flex--align-items--center"
-            v-for="(shop,key) in 2"
+            v-for="(shop,key) in item.pet_list"
             :key="key"
           >
-            <div class="cart_con_list_box_term_state flex flex--align-items--center">
-              <i class="icon iconfont icondanxuanxuanzhong" v-if="!isShow"></i>
+            <div
+              class="cart_con_list_box_term_state flex flex--align-items--center"
+              @click="setchoice(shop)"
+            >
+              <i class="icon iconfont icondanxuanxuanzhong" v-if="!shop.show"></i>
               <i class="icon iconfont iconxuanzhong--" style="color: #949CDF;" v-else></i>
             </div>
             <div class="cart_con_list_box_term_big flex flex--align-items--center">
-               <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" />
+               <van-image :src="shop.cover" @click="deletes(shop.id, index)"/>
                <div class="cart_con_list_box_term_big_rig">
-                 <h3>法国皇家ROYAL CANIN 小型犬</h3>
-                 <p>4个月</p>
-                 <b>¥309</b>
+                 <h3>{{ shop.name }}</h3>
+                 <p>{{ shop.age }}</p>
+                 <b>¥{{ shop.price }}</b>
                </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
     <div class="cart_foot flex flex--align-items--center">
       <div class="cart_foot_state flex flex--align-items--center">
         <i class="icon iconfont icondanxuanxuanzhong" v-if="!isShow"></i>
@@ -53,11 +58,69 @@
 </template>
 
 <script>
+import { getShoppingList, delShopping } from '@/api/cart'
 export default {
   name: 'cart',
   data () {
     return {
-      isShow: false
+      isShow: false,
+      page: 1,
+      limit: 10,
+      cartList: [], // 购物车列表
+      allcount: 0,
+      checkarr: []
+    }
+  },
+  created () {
+    this.getCartList()
+  },
+  watch: {
+    checkarr (newvalue) {
+      if (newvalue.length === this.allcount) {
+        this.isShow = true
+        return
+      }
+      this.isShow = false
+    }
+  },
+  methods: {
+    // 获取购物车数据
+    async getCartList () {
+      const { data } = await getShoppingList({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        page: this.page,
+        limit: this.limit
+      })
+      data.response_data.forEach(v => {
+        this.allcount += v.pet_list.length
+        v.pet_list.forEach(m => {
+          m.show = false
+        })
+      })
+      this.cartList = data.response_data
+    },
+    // 改变选中状态
+    setchoice (shop) {
+      shop.show = !shop.show
+      const index = this.checkarr.indexOf(shop.id)
+      if (index === -1) {
+        this.checkarr.push(shop.id)
+        return
+      }
+      this.checkarr.splice(index, 1)
+    },
+    // 删除
+    async deletes (id, index) {
+      const { data } = await delShopping({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        ids: id
+      })
+      if (data.status === 1) {
+        this.$toast('删除成功')
+        this.cartList.splice(index, 1)
+      } else {
+        this.$toast(data.error_msg)
+      }
     }
   }
 }
@@ -75,7 +138,7 @@ export default {
         padding-bottom: 11px;
         .cart_con_list_head{
           padding: 16px 35px;
-          img{
+          .van-image{
             width: 22px;
             height: 22px;
             margin-right: 11px;

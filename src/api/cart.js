@@ -1,17 +1,17 @@
 import request from '@/utils/request'
 
-export const getCouponList = data => {
+export const getShoppingList = data => {
   return request({
     method: 'POST',
-    url: '/My/coupon',
+    url: '/My/shopping_list',
     data
   })
 }
 
-export const receiveCouponList = data => {
+export const delShopping = data => {
   return request({
     method: 'POST',
-    url: '/My/get_coupon',
+    url: '/My/del_shopping',
     data
   })
 }

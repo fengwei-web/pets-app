@@ -1,5 +1,5 @@
 <template>
-  <div class="takeOutRecord">
+  <div class="takeOutRecord" @scroll="listScroll($event)">
     <div
       class="takeOutRecord_list flex flex--align-items--center flex--justify-content--space-between"
       v-for="(item,index) in takeOutList"
@@ -28,9 +28,11 @@ export default {
     }
   },
   created () {
+    // 获取提现明细数据
     this.getWithdrawalRecord()
   },
   methods: {
+    // 获取提现明细数据
     async getWithdrawalRecord () {
       const parame = {
         token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
@@ -39,7 +41,18 @@ export default {
       }
       const { data } = await withdrawalRecord(parame)
       const { lists } = data.response_data
-      this.takeOutList = lists
+      this.takeOutList.push(...lists)
+    },
+    // 监听到底事件
+    listScroll ($event) {
+      if ((parseInt($event.target.clientHeight) + parseInt($event.target.scrollTop)) === parseInt($event.target.scrollHeight)) {
+        if (this.takeOutList.length % this.limit === 0) {
+          this.page++
+          this.getWithdrawalRecord()
+        } else {
+          this.$toast('暂无更多数据')
+        }
+      }
     }
   }
 }
