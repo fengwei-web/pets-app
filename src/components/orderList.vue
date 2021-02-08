@@ -1,80 +1,201 @@
 <template>
-  <div class="order_list">
-    <div class="order_list_head flex flex--align-items--center flex--justify-content--space-between">
-      <div class="order_list_head_left flex flex--align-items--center">
-        <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" />
-        <p>Panda宠物馆</p>
+  <div>
+    <div class="order_list" v-if="items.status == 0">
+      <div
+        class="order_list_head flex flex--align-items--center flex--justify-content--space-between"
+      >
+        <div class="order_list_head_left flex flex--align-items--center">
+          <van-image :src="items.shop_logo" />
+          <p>{{ items.shop_name }}</p>
+        </div>
+        <span>{{ items.status | status }}</span>
       </div>
-      <span>待付款</span>
-    </div>
 
-    <div class="order_list_box">
-      <div class="order_list_box_term flex flex--align-items--center">
-        <div class="order_list_box_term_pic">
-          <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" />
-        </div>
-        <div class="order_list_box_term_rig">
-          <h3>法国皇家ROYAL CANIN 小型犬</h3>
-          <div class="order_list_box_term_rig_info flex flex--align-items--center">
-            4个月<span>公</span>
+      <div class="order_list_box">
+        <div
+          class="order_list_box_term flex flex--align-items--center"
+          v-for="(item, index) in items.order_pet"
+          :key="index"
+        >
+          <div class="order_list_box_term_pic">
+            <van-image :src="item.pet_cover" />
           </div>
-          <div class="order_list_box_term_rig_price flex flex--justify-content--space-between">
-            ¥309<span>x 1</span>
+          <div class="order_list_box_term_rig">
+            <h3>{{ item.pet_name }}</h3>
+            <div class="order_list_box_term_rig_info flex flex--align-items--center">
+              {{ item.pet_age }}<span>{{ item.pet_sex }}</span>
+            </div>
+            <div class="order_list_box_term_rig_price flex flex--justify-content--space-between">
+              ¥{{ item.pet_price }}
+            </div>
           </div>
         </div>
+        <div class="order_list_box_actual_payment flex flex--justify-content--end">实付款：￥{{ items.p_true_price }}</div>
       </div>
-      <div class="order_list_box_term flex flex--align-items--center">
-        <div class="order_list_box_term_pic">
-          <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" />
-        </div>
-        <div class="order_list_box_term_rig">
-          <h3>法国皇家ROYAL CANIN 小型犬</h3>
-          <div class="order_list_box_term_rig_info flex flex--align-items--center">
-            4个月<span>公</span>
-          </div>
-          <div class="order_list_box_term_rig_price flex flex--justify-content--space-between">
-            ¥309<span>x 1</span>
-          </div>
-        </div>
+      <div
+        class="order_list_foot flex flex--align-items--center flex--justify-content--end"
+        v-if="type == 'order'"
+      >
+        <div class="order_list_foot_term">取消订单</div>
+        <div class="order_list_foot_term">去付款</div>
       </div>
-      <div class="order_list_box_actual_payment flex flex--justify-content--end">实付款：￥199.00</div>
+      <div
+        class="order_list_foot flex flex--align-items--center flex--justify-content--end"
+        v-else
+      >
+        <div class="shopOrder_list_foot_term">查看</div>
+        <div class="shopOrder_list_foot_term">发货</div>
+        <div class="shopOrder_list_foot_term">退款</div>
+      </div>
     </div>
-    <div
-      class="order_list_foot flex flex--align-items--center flex--justify-content--end"
-      v-if="type == 'order'"
-    >
-      <!-- <div class="order_list_foot_term">取消订单</div>
-      <div class="order_list_foot_term">去付款</div>
-      <div class="order_list_foot_term">申请退款</div> -->
-      <div class="order_list_foot_term">查看物流</div>
-      <div class="order_list_foot_term">申请售后</div>
-      <div class="order_list_foot_term">确认收货</div>
-      <div class="order_list_foot_term">去评价</div>
-    </div>
-    <div
-      class="order_list_foot flex flex--align-items--center flex--justify-content--end"
-      v-else
-    >
-      <div class="shopOrder_list_foot_term">查看</div>
-      <div class="shopOrder_list_foot_term">发货</div>
-      <div class="shopOrder_list_foot_term">退款</div>
+    <div class="order_list" v-else>
+      <div
+        class="order_list_head flex flex--align-items--center flex--justify-content--space-between"
+      >
+        <div class="order_list_head_left flex flex--align-items--center">
+          <van-image :src="items.shop_logo" />
+          <p>{{ items.shop_name }}</p>
+        </div>
+        <span>{{ items.status | status }}</span>
+      </div>
+
+      <div class="order_list_box">
+        <div
+          class="order_list_box_term flex flex--align-items--center"
+          v-for="(item, index) in items.order_pet"
+          :key="index"
+        >
+          <div class="order_list_box_term_pic">
+            <van-image :src="item.pet_cover" />
+          </div>
+          <div class="order_list_box_term_rig">
+            <h3>{{ item.pet_name }}</h3>
+            <div class="order_list_box_term_rig_info flex flex--align-items--center">
+              {{ item.pet_age }}<span>{{ item.pet_sex }}</span>
+            </div>
+            <div class="order_list_box_term_rig_price flex flex--justify-content--space-between">
+              ¥{{ item.pet_price }}
+            </div>
+          </div>
+        </div>
+        <div class="order_list_box_actual_payment flex flex--justify-content--end">实付款：￥{{ items.true_price }}</div>
+      </div>
+      <div
+        class="order_list_foot flex flex--align-items--center flex--justify-content--end"
+        v-if="type == 'order'"
+      >
+        <div
+          class="order_list_foot_term"
+          v-if="items.status == 1"
+        >申请退款</div>
+        <div
+          class="order_list_foot_term"
+          v-if="items.status == 2"
+        >查看物流</div>
+        <div
+          class="order_list_foot_term"
+          v-if="items.status == 2"
+        >申请售后</div>
+        <div
+          class="order_list_foot_term"
+          v-if="items.status == 2"
+          @click="confirmReceiving(items.order_sn)"
+        >确认收货</div>
+        <div
+          class="order_list_foot_term"
+          v-if="items.status == 3"
+        >去评价</div>
+      </div>
+      <div
+        class="order_list_foot flex flex--align-items--center flex--justify-content--end"
+        v-else
+      >
+        <div class="shopOrder_list_foot_term">查看</div>
+        <div class="shopOrder_list_foot_term">发货</div>
+        <div class="shopOrder_list_foot_term">退款</div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { getConfirmReceiving } from '@/api/order'
 export default {
   name: 'OrderList',
   props: {
     type: {
       type: String,
       default: 'order'
+    },
+    items: {
+      type: Object,
+      default: null
     }
   },
   data () {
     return {}
   },
-  methods: {}
+  filters: {
+    status (val) {
+      let str = ''
+      switch (val) {
+        case 0:
+          str = '待付款'
+          break
+        case 1:
+          str = '待发货'
+          break
+        case 2:
+          str = '待收货'
+          break
+        case 3:
+          str = '已完成'
+          break
+        case 5:
+          str = '已取消'
+          break
+        case 6:
+          str = '申请退款'
+          break
+        case 7:
+          str = '同意退款'
+          break
+        case 8:
+          str = '完成退款'
+          break
+        case 9:
+          str = '商家拒绝退款'
+          break
+        case 10:
+          str = '申请售后'
+          break
+        case 11:
+          str = '售后同意退款'
+          break
+        case 12:
+          str = '售后完成退款'
+          break
+        case 13:
+          str = '商家拒绝售后退款'
+          break
+      }
+      return str
+    }
+  },
+  methods: {
+    async confirmReceiving (orderSn) {
+      const { data } = await getConfirmReceiving({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        order_sn: orderSn
+      })
+      if (data.status === 1) {
+        this.$toast(data.msg)
+        this.$emit('confirmReceiving')
+      } else {
+        this.$toast(data.error_msg)
+      }
+    }
+  }
 }
 </script>
 
@@ -157,10 +278,11 @@ export default {
       }
     }
     .order_list_foot{
-      height: 63px;
-      border-top: 1px solid #DEDEDE;
+      // height: 63px;
+      border-top: 1px solid #eee;
       .order_list_foot_term{
         padding: 7px;
+        margin: 15px 0;
         box-sizing: border-box;
         border: 1px solid #949cdf;
         border-radius: 4px;

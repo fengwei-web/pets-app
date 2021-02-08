@@ -38,9 +38,8 @@
         </div>
       </div>
     </div>
-
     <div class="cart_foot flex flex--align-items--center">
-      <div class="cart_foot_state flex flex--align-items--center">
+      <div class="cart_foot_state flex flex--align-items--center" @click="selectAll">
         <i class="icon iconfont icondanxuanxuanzhong" v-if="!isShow"></i>
         <i class="icon iconfont iconxuanzhong--" style="color: #949CDF;" v-else></i>
         <b>全选</b>
@@ -48,11 +47,10 @@
       <div class="cart_foot_price flex flex--align-items--center flex--justify-content--center">
         <div class="cart_foot_price_txt">合计：</div>
         <div class="cart_foot_price_money flex flex--align-items--end">
-          ￥120.
-          <p>00</p>
+          ￥{{ total }}
         </div>
       </div>
-      <van-button class="cart_foot_btn" type="info">去结算</van-button>
+      <van-button class="cart_foot_btn" type="info" @click="goSettlement">去结算</van-button>
     </div>
   </div>
 </template>
@@ -68,7 +66,8 @@ export default {
       limit: 10,
       cartList: [], // 购物车列表
       allcount: 0,
-      checkarr: []
+      checkarr: [],
+      total: '0.00'
     }
   },
   created () {
@@ -76,6 +75,9 @@ export default {
   },
   watch: {
     checkarr (newvalue) {
+      // 计算总价
+      this.setTotal()
+      // 监听是否全选
       if (newvalue.length === this.allcount) {
         this.isShow = true
         return
@@ -121,7 +123,34 @@ export default {
       } else {
         this.$toast(data.error_msg)
       }
-    }
+    },
+    // 全选
+    selectAll () {
+      this.isShow = !this.isShow
+      if (this.isShow) {
+        this.cartList.forEach((v, i) => {
+          v.pet_list.forEach((item, key) => { item.show = true })
+        })
+      } else {
+        this.cartList.forEach((v, i) => {
+          v.pet_list.forEach((item, key) => { item.show = false })
+        })
+      }
+      // 点击全选时改变价格
+      this.setTotal()
+    },
+    // 计算总价
+    setTotal () {
+      let totalPrice = 0
+      this.cartList.forEach(item => {
+        item.pet_list.forEach((element, index) => {
+          if (element.show) totalPrice += parseFloat(element.price)
+        })
+      })
+      this.total = totalPrice.toFixed(2)
+    },
+    // 去结算
+    goSettlement () {}
   }
 }
 </script>
@@ -227,10 +256,6 @@ export default {
           font-size: 18px;
           font-weight: bold;
           color: #E41F35;
-          p{
-            font-size: 14px;
-            padding-bottom: 1px;
-          }
         }
       }
       .cart_foot_btn{

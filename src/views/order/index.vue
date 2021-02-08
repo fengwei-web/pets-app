@@ -14,29 +14,27 @@
       </div>
     </div>
 
-    <div class="order_list">
-      <div v-if="tabIndex == 0">
-        <orderList></orderList>
+    <div class="order_list" @scroll="listScroll($event)">
+      <div v-for="(item, index) in orderList" :key="index">
+        <orderList
+          v-for="msg in item"
+          :key="msg.id"
+          :items="msg"
+          @confirmReceiving = "confirmReceiving"
+        ></orderList>
       </div>
-
-      <!-- <div v-if="tabIndex == 1">
-        <orderList></orderList>
+      <div
+        class="order_nothing flex flex--align-items--center flex--justify-content--center"
+        v-if="orderList.length == 0">
+        暂无数据
       </div>
-      <div v-if="tabIndex == 2">
-        <orderList></orderList>
-      </div>
-      <div v-if="tabIndex == 3">
-        <orderList></orderList>
-      </div>
-      <div v-if="tabIndex == 4">
-        <orderList></orderList>
-      </div> -->
     </div>
   </div>
 </template>
 
 <script>
 import orderList from '@/components/orderList.vue'
+import { getOrderLists } from '@/api/order'
 export default {
   name: 'Order',
   components: {
@@ -61,14 +59,68 @@ export default {
           title: '待评价 '
         }
       ],
-      tabIndex: 0 // 当前tab下标
+      tabIndex: 0, // 当前tab下标
+      status: null,
+      page: 1,
+      limit: 10,
+      orderList: []
     }
   },
-  created () {},
+  created () {
+    // 获取订单列表数据
+    this.getOrderList()
+  },
   methods: {
     // 点击切换tab
     setTab (index) {
       this.tabIndex = index
+      switch (index) {
+        case 0:
+          this.status = null
+          break
+        case 1:
+          this.status = 0
+          break
+        case 2:
+          this.status = 1
+          break
+        case 3:
+          this.status = 2
+          break
+        case 4:
+          this.status = 3
+          break
+      }
+      this.orderList = []
+      this.page = 1
+      this.getOrderList()
+    },
+    // 获取列表数据
+    async getOrderList () {
+      const { data } = await getOrderLists({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        status: this.status,
+        page: this.page,
+        limit: this.limit
+      })
+      const responseData = data.response_data
+      this.orderList.push(...responseData)
+    },
+    // 监听到底事件
+    listScroll ($event) {
+      if ((parseInt($event.target.clientHeight) + parseInt($event.target.scrollTop)) === parseInt($event.target.scrollHeight)) {
+        if (this.orderList.length % this.limit === 0) {
+          this.page++
+          this.getOrderList()
+        } else {
+          this.$toast('暂无更多数据')
+        }
+      }
+    },
+    // 刷新页面
+    confirmReceiving () {
+      this.orderList = []
+      this.getOrderList()
     }
   }
 }
@@ -107,6 +159,11 @@ export default {
     .order_list{
       flex: 1;
       overflow-y: auto;
+      .order_nothing{
+        height: 300px;
+        font-size: 16px;
+        color: #333;
+      }
     }
   }
 </style>

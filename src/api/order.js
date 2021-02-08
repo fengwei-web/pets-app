@@ -1,9 +1,17 @@
 import request from '@/utils/request'
 
-export const login = data => {
+export const getOrderLists = data => {
   return request({
     method: 'POST',
-    url: '/app/v1_0/authorizations',
+    url: '/Shoporder/lists',
+    data
+  })
+}
+
+export const getConfirmReceiving = data => {
+  return request({
+    method: 'POST',
+    url: '/Shoporder/confirm',
     data
   })
 }
