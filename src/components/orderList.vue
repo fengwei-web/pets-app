@@ -11,7 +11,7 @@
         <span>{{ items.status | status }}</span>
       </div>
 
-      <div class="order_list_box">
+      <div class="order_list_box" @click="goDetail(items.p_order_sn)">
         <div
           class="order_list_box_term flex flex--align-items--center"
           v-for="(item, index) in items.order_pet"
@@ -36,7 +36,7 @@
         class="order_list_foot flex flex--align-items--center flex--justify-content--end"
         v-if="type == 'order'"
       >
-        <div class="order_list_foot_term">取消订单</div>
+        <div class="order_list_foot_term" @click="goRefund(1, items.p_order_sn)">取消订单</div>
         <div class="order_list_foot_term">去付款</div>
       </div>
       <div
@@ -59,7 +59,7 @@
         <span>{{ items.status | status }}</span>
       </div>
 
-      <div class="order_list_box">
+      <div class="order_list_box"  @click="goDetail(items.order_sn)">
         <div
           class="order_list_box_term flex flex--align-items--center"
           v-for="(item, index) in items.order_pet"
@@ -87,6 +87,7 @@
         <div
           class="order_list_foot_term"
           v-if="items.status == 1"
+          @click="goRefund(2, items.order_sn)"
         >申请退款</div>
         <div
           class="order_list_foot_term"
@@ -95,6 +96,7 @@
         <div
           class="order_list_foot_term"
           v-if="items.status == 2"
+          @click="goRefund(3, items.order_sn)"
         >申请售后</div>
         <div
           class="order_list_foot_term"
@@ -183,6 +185,7 @@ export default {
     }
   },
   methods: {
+    // 确认收货
     async confirmReceiving (orderSn) {
       const { data } = await getConfirmReceiving({
         token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
@@ -194,6 +197,26 @@ export default {
       } else {
         this.$toast(data.error_msg)
       }
+    },
+    // 取消订单/订单退款/订单售后
+    goRefund (type, orderSn) {
+      this.$router.push({
+        path: '/order/refund',
+        query: {
+          type: type,
+          orderSn: orderSn
+        }
+      })
+    },
+    // 进入详情
+    goDetail (orderSn) {
+      console.log(orderSn)
+      this.$router.push({
+        path: '/order/detail',
+        query: {
+          orderSn: orderSn
+        }
+      })
     }
   }
 }

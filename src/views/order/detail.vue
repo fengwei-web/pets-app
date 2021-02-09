@@ -4,10 +4,13 @@
     <div class="order_detail_con">
       <div class="order_detail_head flex flex--align-items--center">
         <div class="order_detail_head_pic flex flex--justify-content--end">
-          <p>等待付款</p>
+          <p>{{ detailsObj.status | setStatus }}</p>
         </div>
-        <div class="order_detail_head_tip">
-          剩3天订单将自动关闭
+        <div
+          class="order_detail_head_tip"
+          v-if="detailsObj.status == 0"
+        >
+          剩{{ detailsObj.remaining_time }}订单将自动关闭
         </div>
       </div>
       <div class="order_detail_address flex flex--align-items--center flex--justify-content--space-between">
@@ -16,73 +19,210 @@
         </div>
         <div class="order_detail_address_box flex flex--row flex--justify-content--space-between">
           <div class="order_detail_address_box_top flex flex--justify-content--space-between">
-            <h3 class="one_wap">刘小华山</h3>
-            <h3 class="one_wap">24355646767</h3>
+            <h3 class="one_wap">{{ detailsObj.address_name }}</h3>
+            <h3 class="one_wap">{{ detailsObj.address_phone }}</h3>
           </div>
-          <div class="order_detail_address_box_bot one_wap">北京市 朝阳区人民法院 505室</div>
+          <div class="order_detail_address_box_bot one_wap">{{ detailsObj.address }}</div>
         </div>
         <i class="icon iconfont iconyoubianxiaojiantou"></i>
       </div>
       <div class="order_detail_shop">
         <div class="order_list_head flex flex--align-items--center flex--justify-content--space-between">
           <div class="order_list_head_left flex flex--align-items--center">
-            <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" />
-            <p>Panda宠物馆</p>
+            <van-image :src="detailsObj.shop_logo" />
+            <p>{{ detailsObj.shop_name }}</p>
           </div>
-          <span>待付款</span>
+          <!-- <span>待付款</span> -->
         </div>
-
         <div class="order_list_box">
-          <div class="order_list_box_term flex flex--align-items--center">
+          <div
+            class="order_list_box_term flex flex--align-items--center"
+            v-for="(item, index) in detailsObj.order_pet"
+            :key="index"
+          >
             <div class="order_list_box_term_pic">
-              <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" />
+              <van-image :src="item.pet_cover" />
             </div>
             <div class="order_list_box_term_rig">
-              <h3>法国皇家ROYAL CANIN 小型犬</h3>
+              <h3>{{ item.pet_name }}</h3>
               <div class="order_list_box_term_rig_info flex flex--align-items--center">
-                4个月<span>公</span>
+                {{ item.pet_age }}<span>{{ item.pet_sex }}</span>
               </div>
-              <div class="order_list_box_term_rig_price flex flex--justify-content--space-between">
-                ¥309<span>x 1</span>
+              <div class="order_list_box_term_rig_price">
+                ¥{{ item.pet_price }}
               </div>
             </div>
           </div>
-          <div class="order_list_box_actual_payment flex flex--justify-content--end">实付款：￥199.00</div>
+          <div class="order_list_box_actual_payment flex flex--justify-content--end">
+            实付款：￥{{ detailsObj.status == 0 ? detailsObj.p_true_price : detailsObj.true_price }}
+          </div>
           <div class="order_list_box_info">
             <div class="order_list_box_info_term flex flex--align-items--center flex--justify-content--space-between">
               <p>运送快递</p>
-              <span>￥199.00</span>
+              <span>￥{{ detailsObj.status == 0 ? detailsObj.p_distribution_way_freight : detailsObj.distribution_way_freight }}</span>
             </div>
             <div class="order_list_box_info_term flex flex--align-items--center flex--justify-content--space-between">
               <p>实付款</p>
-              <span>￥199.00</span>
+              <span>￥{{ detailsObj.status == 0 ? detailsObj.p_true_price : detailsObj.true_price }}</span>
             </div>
           </div>
         </div>
       </div>
       <div class="order_detail_info">
-        <van-cell :border="false" title="支付方式" value="微信支付" size="large" />
-        <van-cell :border="false" title="订单编号" value="1341652131567461563132" size="large" />
-        <van-cell :border="false" title="创建时间" value="2020-12-12 13:23:42" size="large" />
-        <van-cell :border="false" title="付款时间" value="2020-12-12 13:23:42" size="large" />
-        <van-cell :border="false" title="发货时间" value="2020-12-12 13:23:42" size="large" />
-        <van-cell :border="false" title="买家留言" value="请邮寄顺丰快递，这个货要的比较急" size="large" />
+        <van-cell
+          :border="false"
+          title="支付方式"
+          :value="detailsObj.pay_method | payMethod"
+          v-if="detailsObj.status != 0"
+          size="large"
+        />
+        <van-cell
+          :border="false"
+          title="订单编号"
+          :value="detailsObj.status == 0 ? detailsObj.p_order_sn : detailsObj.order_sn"
+          size="large"
+        />
+        <van-cell
+          :border="false"
+          title="创建时间"
+          :value="detailsObj.ctime"
+          size="large"
+        />
+        <van-cell
+          :border="false"
+          title="付款时间"
+          :value="detailsObj.pay_time"
+          v-if="detailsObj.status != 0"
+          size="large"
+        />
+        <van-cell
+          :border="false"
+          title="发货时间"
+          :value="detailsObj.send_time"
+          v-if="detailsObj.status != 0"
+          size="large"
+        />
+        <van-cell
+          :border="false"
+          title="买家留言"
+          :value="detailsObj.remark == null || detailsObj.remark == '' ? '暂无' : detailsObj.remark" size="large"
+        />
       </div>
     </div>
-    <div class="order_detail_foot flex flex--align-items--center flex--justify-content--end">
-      <div class="order_detail_foot_ash">取消订单</div>
-      <!-- <div class="order_detail_foot_ash">申请退款</div> -->
-      <!-- <div class="order_detail_foot_ash">查看物流</div> -->
-      <div class="order_detail_foot_ash">申请售后</div>
-      <div class="order_detail_foot_purple">去支付</div>
-      <!-- <div class="order_detail_foot_purple">确认收货</div> -->
+    <div
+      class="order_detail_foot flex flex--align-items--center flex--justify-content--end"
+      v-if="detailsObj.status < 3"
+    >
+      <div
+        class="order_detail_foot_ash"
+        v-if="detailsObj.status == 0"
+      >取消订单</div>
+      <div
+        class="order_detail_foot_ash"
+        v-if="detailsObj.status == 1"
+      >申请退款</div>
+      <div
+        class="order_detail_foot_ash"
+        v-if="detailsObj.status == 2"
+      >查看物流</div>
+      <div
+        class="order_detail_foot_ash"
+        v-if="detailsObj.status == 2"
+      >申请售后</div>
+      <div
+        class="order_detail_foot_purple"
+        v-if="detailsObj.status == 0"
+      >去支付</div>
+      <div
+        class="order_detail_foot_purple"
+        v-if="detailsObj.status == 2"
+      >确认收货</div>
     </div>
   </div>
 </template>
 
 <script>
+import { getDetail } from '@/api/order'
 export default {
-  name: 'OrderDetail'
+  name: 'OrderDetail',
+  data () {
+    return {
+      orderSn: '',
+      detailsObj: null
+    }
+  },
+  created () {
+    this.orderSn = this.$route.query.orderSn
+    this.getOrderDetails()
+  },
+  filters: {
+    setStatus (val) {
+      let str = ''
+      switch (val) {
+        case 0:
+          str = '待付款'
+          break
+        case 1:
+          str = '待发货'
+          break
+        case 2:
+          str = '待收货'
+          break
+        case 3:
+          str = '已完成'
+          break
+        case 5:
+          str = '已取消'
+          break
+        case 6:
+          str = '申请退款'
+          break
+        case 7:
+          str = '同意退款'
+          break
+        case 8:
+          str = '完成退款'
+          break
+        case 9:
+          str = '商家拒绝退款'
+          break
+        case 10:
+          str = '申请售后'
+          break
+        case 11:
+          str = '售后同意退款'
+          break
+        case 12:
+          str = '售后完成退款'
+          break
+        case 13:
+          str = '商家拒绝售后退款'
+          break
+      }
+      return str
+    },
+    payMethod (val) {
+      let str = ''
+      switch (val) {
+        case '1':
+          str = '微信支付'
+          break
+        case '2':
+          str = '支付宝支付'
+          break
+      }
+      return str
+    }
+  },
+  methods: {
+    async getOrderDetails () {
+      const { data } = await getDetail({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        order_sn: this.orderSn
+      })
+      this.detailsObj = data.response_data[0]
+    }
+  }
 }
 </script>
 
@@ -217,10 +357,6 @@ export default {
               font-size: 20px;
               color: #E41F35;
               margin-top: 23px;
-              span{
-                font-size: 14px;
-                color: #5C5C5C;
-              }
             }
           }
         }

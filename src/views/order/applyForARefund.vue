@@ -2,7 +2,10 @@
   <!-- 申请退款页面 -->
   <div class="refund">
     <div class="refund_cell">
-      <van-cell title="退款方式" is-link value="不想要了" />
+      <van-cell title="退款方式" is-link value="不想要了" @click="show = true">
+        <p slot="title">{{ type | types }}</p>
+        <span slot="default">{{ desc }}</span>
+      </van-cell>
     </div>
     <div class="refund_title">
       <h3>描述</h3>
@@ -17,17 +20,108 @@
       />
     </div>
     <div class="refund_btn">
-      <van-button type="primary" color="#949CDF" block>提交</van-button>
+      <van-button type="primary" color="#949CDF" block @click="setSubmit">提交</van-button>
     </div>
+    <van-popup
+      v-model="show"
+      position="bottom"
+    >
+      <van-picker
+        :title="type | types"
+        show-toolbar
+        :columns="columns"
+        @confirm="onConfirm"
+        @cancel="show = false"
+      />
+    </van-popup>
   </div>
 </template>
 
 <script>
+import { getReason, getUpdateStatus } from '@/api/order'
 export default {
   name: 'applyForARefund',
   data () {
     return {
-      message: ''
+      message: '',
+      type: 1,
+      orderSn: '',
+      desc: '请选择原因',
+      descIndex: 0,
+      columns: [],
+      columnsId: [],
+      show: false
+    }
+  },
+  created () {
+    this.type = this.$route.query.type
+    this.orderSn = this.$route.query.orderSn
+    // 获取原因数据
+    this.getReasonList()
+  },
+  filters: {
+    types (val) {
+      let str = ''
+      switch (val) {
+        case '1':
+          str = '取消方式'
+          break
+        case '2':
+          str = '退款方式'
+          break
+        case '3':
+          str = '售后方式'
+      }
+      return str
+    }
+  },
+  methods: {
+    // 获取原因数据
+    async getReasonList () {
+      const { data } = await getReason({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        type: this.type
+      })
+      data.response_data.forEach(element => {
+        this.columns.push(element.name)
+        this.columnsId.push(element.id)
+      })
+    },
+    // 选择确定
+    onConfirm (value, index) {
+      this.show = false
+      this.desc = value
+      this.descIndex = index
+    },
+    // 提交
+    async setSubmit () {
+      if (this.desc === '请选择原因') {
+        this.$toast('请选择原因')
+        return
+      }
+      let status = ''
+      switch (this.type) {
+        case '1':
+          status = 5
+          break
+        case '2':
+          status = 6
+          break
+        case '3':
+          status = 10
+          break
+      }
+      const { data } = await getUpdateStatus({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        order_sn: this.orderSn,
+        status: status,
+        reason: this.columns[this.descIndex],
+        reason_desc: this.message
+      })
+      this.$toast(data.msg)
+      setTimeout(() => {
+        this.$router.go(-1)
+      }, 1500)
     }
   }
 }
