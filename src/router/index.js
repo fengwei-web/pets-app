@@ -56,7 +56,7 @@ const routes = [
     name: 'shopOrder',
     component: () => import('../views/shopOrder/')
   },
-  // 商家订单列表
+  // 商家订单详情
   {
     path: '/shopOrder/detail',
     name: 'shopOrderDetail',

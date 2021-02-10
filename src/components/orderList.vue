@@ -302,6 +302,7 @@ export default {
     }
     .order_list_foot{
       // height: 63px;
+      padding: 15px 0;
       border-top: 1px solid #eee;
       .order_list_foot_term{
         padding: 7px;
