@@ -98,10 +98,16 @@
       </div>
     </div>
     <div class="order_detail_foot flex flex--align-items--center flex--justify-content--end">
-      <div class="order_detail_foot_purple">发货</div>
+      <div
+        class="order_detail_foot_purple"
+        @click="deliverGoods(shopOrderDetail.order_sn)"
+      >发货</div>
       <!-- <div class="order_detail_foot_ash">申请退款</div> -->
       <!-- <div class="order_detail_foot_ash">查看物流</div> -->
-      <div class="order_detail_foot_purple">物流</div>
+      <div
+        class="order_detail_foot_purple"
+        @click="logistics(shopOrderDetail.order_sn)"
+      >物流</div>
       <!-- <div class="order_detail_foot_purple">去支付</div> -->
       <!-- <div class="order_detail_foot_purple">确认收货</div> -->
     </div>
@@ -190,6 +196,14 @@ export default {
       })
       console.log(data)
       this.shopOrderDetail = data.response_data
+    },
+    // 发货
+    deliverGoods (orderOn) {
+      console.log('发货')
+    },
+    // 物流
+    logistics (orderOn) {
+      console.log('物流')
     }
   }
 }

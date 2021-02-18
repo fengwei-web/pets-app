@@ -116,18 +116,22 @@
       <div
         class="order_detail_foot_ash"
         v-if="detailsObj.status == 0"
+        @click="goRefund(1, detailsObj.order_sn)"
       >取消订单</div>
       <div
         class="order_detail_foot_ash"
         v-if="detailsObj.status == 1"
+        @click="goRefund(2, detailsObj.order_sn)"
       >申请退款</div>
       <div
         class="order_detail_foot_ash"
         v-if="detailsObj.status == 2"
+        @click="seeLogistics(detailsObj.order_sn)"
       >查看物流</div>
       <div
         class="order_detail_foot_ash"
         v-if="detailsObj.status == 2"
+        @click="goRefund(3, detailsObj.order_sn)"
       >申请售后</div>
       <div
         class="order_detail_foot_purple"
@@ -136,6 +140,7 @@
       <div
         class="order_detail_foot_purple"
         v-if="detailsObj.status == 2"
+        @click="confirmReceiving(detailsObj.order_sn)"
       >确认收货</div>
     </div>
   </div>
@@ -221,6 +226,26 @@ export default {
         order_sn: this.orderSn
       })
       this.detailsObj = data.response_data[0]
+      console.log(this.detailsObj)
+    },
+    // 取消订单/订单退款/订单售后
+    goRefund (type, orderSn) {
+      this.$router.push({
+        path: '/order/refund',
+        query: {
+          type: type,
+          orderSn: orderSn
+        }
+      })
+    },
+    // 查看物流
+    seeLogistics (orderSn) {
+      this.$router.push({
+        path: '/order/viewLog',
+        query: {
+          orderSn: orderSn
+        }
+      })
     }
   }
 }

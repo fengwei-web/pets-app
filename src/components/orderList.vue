@@ -85,6 +85,11 @@
         v-if="type == 'order'"
       >
         <div
+          class="order_detail_foot_ash"
+          v-if="items.status == 0"
+          @click="goRefund(1, items.order_sn)"
+        >取消订单</div>
+        <div
           class="order_list_foot_term"
           v-if="items.status == 1"
           @click="goRefund(2, items.order_sn)"
@@ -92,6 +97,7 @@
         <div
           class="order_list_foot_term"
           v-if="items.status == 2"
+          @click="seeLogistics(items.order_sn)"
         >查看物流</div>
         <div
           class="order_list_foot_term"
@@ -210,9 +216,17 @@ export default {
     },
     // 进入详情
     goDetail (orderSn) {
-      console.log(orderSn)
       this.$router.push({
         path: '/order/detail',
+        query: {
+          orderSn: orderSn
+        }
+      })
+    },
+    // 查看物流
+    seeLogistics (orderSn) {
+      this.$router.push({
+        path: '/order/viewLog',
         query: {
           orderSn: orderSn
         }

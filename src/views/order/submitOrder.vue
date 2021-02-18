@@ -2,47 +2,59 @@
   <div class="submit flex flex--row">
     <div class="submit_con">
       <div class="submit_con_address">
-        <!-- <div class="submit_con_address_yes flex flex--align-items--center flex--justify-content--space-between">
+        <div
+          class="submit_con_address_yes flex flex--align-items--center flex--justify-content--space-between"
+          v-if="submitDetail.address_info.id !== 0"
+        >
           <div class="submit_con_address_yes_left">
             <div class="submit_con_address_yes_left_top flex flex--align-items--center">
-              <h3 class="one_wap">刘小山</h3>
-              <p class="one_wap">24355646767</p>
+              <h3 class="one_wap">{{ submitDetail.address_info.consignee_name }}</h3>
+              <p class="one_wap">{{ submitDetail.address_info.consignee_phone }}</p>
             </div>
-            <div class="submit_con_address_yes_left_bot one_wap">收货地址：北京市 朝阳区人民法院 505室</div>
+            <div
+              class="submit_con_address_yes_left_bot one_wap"
+            >
+              收货地址：{{ submitDetail.address_info.region }} {{ submitDetail.address_info.address }}
+            </div>
           </div>
           <div class="submit_con_address_yes_right flex flex--align-items--center">
             <i class="icon iconfont iconyoubianxiaojiantou"></i>
           </div>
-        </div> -->
-        <div class="submit_con_address_nothing flex flex--justify-content--center">请选择地址...</div>
+        </div>
+        <div
+          class="submit_con_address_nothing flex flex--justify-content--center"
+          v-else
+        >请选择地址...</div>
       </div>
 
       <div class="submit_con_info">
         <div
           class="info_shop"
+          v-for="(submit, key) in submitDetail.c_order_lists"
+          :key="key"
         >
           <div class="info_shop_head flex flex--align-items--center">
-            <img src="../../../static/ceshi/dianpu_pic.png" alt="">
-            <h3>Panda宠物生活馆</h3>
+            <img :src="submit.shop_info.shop_logo" alt="">
+            <h3>{{ submit.shop_info.shop_name }}</h3>
           </div>
           <div class="info_shop_box">
             <div
               class="info_shop_box_list flex flex--align-items--center"
-              v-for="(item,index) in 2"
+              v-for="(item, index) in submit.pet_list"
               :key="index"
             >
               <div class="info_shop_box_list_left">
-                <van-image src="https://img.yzcdn.cn/vant/cat.jpeg"></van-image>
+                <van-image :src="item.cover"></van-image>
               </div>
               <div class="info_shop_box_list_right">
-                <h3>法国皇家ROYAL CANIN 小型犬 1190</h3>
+                <h3>{{ item.name }}</h3>
                 <p>
-                  4个月
-                  <span>公</span>
+                  {{ item.age }}
+                  <span>{{ item.sex }}</span>
                 </p>
                 <div class="info_shop_box_list_right_price flex flex--align-items--center flex--justify-content--space-between">
-                    <h3>¥ 3900.00</h3>
-                    <p>x1</p>
+                    <h3>¥ {{ item.price }}</h3>
+                    <!-- <p>x1</p> -->
                 </div>
               </div>
             </div>
@@ -54,28 +66,79 @@
         </div>
 
         <div class="info_cell">
-          <van-cell title="商品金额" value="¥ 3900.00" :border="false"/>
-          <van-cell title="运费" value="¥ 3900.00" :border="false"/>
+          <van-cell title="商品金额" :value="'¥' + submitDetail.order_info.total_price" :border="false"/>
+          <van-cell title="运费" :value="'¥' + submitDetail.order_info.distribution_way_freight" :border="false"/>
         </div>
       </div>
     </div>
 
     <div class="submit_foot flex flex--align-items--center flex--justify-content--space-between">
       <div class="submit_foot_left flex flex--align-items--end">
-        ￥120.
-        <p>00</p>
+        ￥{{ submitDetail.order_info.true_price }}
+        <!-- <p>00</p> -->
       </div>
-      <van-button type="info">提交订单</van-button>
+      <van-button
+        type="info"
+        @click="submitOrder"
+      >提交订单</van-button>
     </div>
   </div>
 </template>
 
 <script>
+import { getWriteOrder, getCommitOrder } from '@/api/order'
 export default {
   name: 'submitOrder',
   data () {
     return {
-      message: ''
+      message: '',
+      submitDetail: null
+    }
+  },
+  created () {
+    this.getWriteOrderDetail()
+  },
+  methods: {
+    async getWriteOrderDetail () {
+      const { data } = await getWriteOrder({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        type: 2,
+        // type=1 必填
+        shopping_ids: '',
+        // type=2 必填
+        pet_id: '4',
+        distribution_way_id: 1,
+        distribution_way_freight: 0
+      })
+      this.submitDetail = data.response_data
+    },
+    // 提交订单
+    async submitOrder () {
+      if (this.submitDetail.address_info.id === 0) {
+        this.$toast('请选择收货地址！')
+        return
+      }
+      const address = this.submitDetail.address_info
+      const { data } = await getCommitOrder({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        type: 2,
+        shopping_ids: '',
+        pet_id: 4,
+        address_name: address.consignee_name,
+        address_phone: address.consignee_phone,
+        address: address.address,
+        remark: this.message,
+        distribution_way_id: 1,
+        distribution_way_freight: 0
+      })
+
+      this.$router.push({
+        path: '/order/payment',
+        query: {
+          orderSn: data.response_data.order_sn,
+          truePrice: data.response_data.true_price
+        }
+      })
     }
   }
 }

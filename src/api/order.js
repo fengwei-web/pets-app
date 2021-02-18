@@ -39,3 +39,21 @@ export const getDetail = data => {
     data
   })
 }
+
+// 提交订单第一步：返回订单的信息详情
+export const getWriteOrder = data => {
+  return request({
+    method: 'POST',
+    url: '/Shop/write_order',
+    data
+  })
+}
+
+// 提交订单第二步：提交生成订单
+export const getCommitOrder = data => {
+  return request({
+    method: 'POST',
+    url: '/Shop/commit_order',
+    data
+  })
+}

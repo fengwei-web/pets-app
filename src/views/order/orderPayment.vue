@@ -4,8 +4,8 @@
       <div class="payment_head_left">支付金额</div>
       <div class="payment_head_right flex flex--align-items--end">
         <b>¥</b>
-        <h3>10</h3>
-        <p>.00</p>
+        <h3>{{ truePrice | truePrice1 }}</h3>
+        <p>.{{ truePrice | truePrice2 }}</p>
       </div>
     </div>
     <div class="payment_tab">
@@ -50,10 +50,23 @@ export default {
           text: '支付宝支付',
           isShow: false
         }
-      ] // 这是存放支付方式的数组
+      ], // 这是存放支付方式的数组
+      truePrice: 0
+    }
+  },
+  created () {
+    this.truePrice = this.$route.query.truePrice
+  },
+  filters: {
+    truePrice1 (val) {
+      return val.split('.')[0]
+    },
+    truePrice2 (val) {
+      return val.split('.')[1]
     }
   },
   methods: {
+    // 选择支付方式
     setTabIsShow (item) {
       if (!item.isShow) {
         this.tabList.forEach(v => {

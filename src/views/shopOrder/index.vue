@@ -1,7 +1,11 @@
 <template>
   <div class="shopOrder flex flex--row">
     <div class="shopOrder_search">
-      <van-search v-model="massage" placeholder="请输入搜索关键词" />
+      <van-search
+        v-model="massage"
+        placeholder="请输入搜索关键词"
+        @input="input"
+      />
     </div>
 
     <div class="shopOrder_box">
@@ -49,6 +53,14 @@
             v-if="item.status == 2"
             @click="logistics(item.order_sn)"
           >物流</div>
+          <div
+            class="shopOrder_box_list_foot_term"
+            @click="refund(item.order_sn)"
+          >退款</div>
+          <div
+            class="shopOrder_box_list_foot_term"
+            @click="afterSales(item.order_sn)"
+          >售后</div>
         </div>
       </div>
      </div>
@@ -57,6 +69,7 @@
 
 <script>
 import { getShopOrderLists } from '@/api/shopOrder'
+import { debounce } from 'lodash'
 export default {
   name: 'orderSearch',
   data () {
@@ -126,7 +139,6 @@ export default {
         page: this.page,
         limit: this.limit
       })
-      console.log(data)
       this.shopOrderLists = data.response_data
     },
     // 查看 进入详情
@@ -138,6 +150,10 @@ export default {
         }
       })
     },
+    // 搜索
+    input: debounce(function () {
+      this.getShopOrderList()
+    }, 200),
     // 发货
     deliverGoods () {
       console.log('发货')
@@ -145,6 +161,14 @@ export default {
     // 物流
     logistics () {
       console.log('物流')
+    },
+    // 退款
+    refund () {
+      console.log('退款')
+    },
+    // 售后
+    afterSales () {
+      console.log('售后')
     }
   }
 }
