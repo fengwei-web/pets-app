@@ -62,6 +62,18 @@ const routes = [
     name: 'shopOrderDetail',
     component: () => import('../views/shopOrder/detail')
   },
+  // 商家发货
+  {
+    path: '/shopOrder/deliverGoods',
+    name: 'deliverGoods',
+    component: () => import('../views/shopOrder/deliverGoods')
+  },
+  // 商家售后
+  {
+    path: '/shopOrder/afterSales',
+    name: 'afterSales',
+    component: () => import('../views/shopOrder/afterSales')
+  },
   // 优惠券列表
   {
     path: '/coupon',

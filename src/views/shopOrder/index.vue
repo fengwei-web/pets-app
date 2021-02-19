@@ -8,7 +8,7 @@
       />
     </div>
 
-    <div class="shopOrder_box">
+    <div class="shopOrder_box" @scroll="listScroll">
       <div
         class="shopOrder_box_list"
         v-for="(item, index) in shopOrderLists"
@@ -55,10 +55,12 @@
           >物流</div>
           <div
             class="shopOrder_box_list_foot_term"
+            v-if="item.status == 6"
             @click="refund(item.order_sn)"
-          >退款</div>
+          >同意退款</div>
           <div
             class="shopOrder_box_list_foot_term"
+            v-if="item.status == 10"
             @click="afterSales(item.order_sn)"
           >售后</div>
         </div>
@@ -68,7 +70,7 @@
 </template>
 
 <script>
-import { getShopOrderLists } from '@/api/shopOrder'
+import { getShopOrderLists, getOrderRefund } from '@/api/shopOrder'
 import { debounce } from 'lodash'
 export default {
   name: 'orderSearch',
@@ -150,25 +152,56 @@ export default {
         }
       })
     },
+    // 监听到底事件
+    listScroll ($event) {
+      if ((parseInt($event.target.clientHeight) + parseInt($event.target.scrollTop)) === parseInt($event.target.scrollHeight)) {
+        if (this.shopOrderLists.length % this.limit === 0) {
+          this.page++
+          this.getShopOrderList()
+        } else {
+          this.$toast('暂无更多数据')
+        }
+      }
+    },
     // 搜索
     input: debounce(function () {
       this.getShopOrderList()
     }, 200),
     // 发货
-    deliverGoods () {
-      console.log('发货')
+    deliverGoods (orderSn) {
+      this.$router.push({
+        path: '/shopOrder/deliverGoods',
+        query: {
+          orderSn: orderSn
+        }
+      })
     },
     // 物流
-    logistics () {
-      console.log('物流')
+    logistics (orderSn) {
+      this.$router.push({
+        path: '/order/viewLog',
+        query: {
+          orderSn: orderSn
+        }
+      })
     },
     // 退款
-    refund () {
-      console.log('退款')
+    async refund (orderSn) {
+      await getOrderRefund({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        order_sn: orderSn,
+        type: 1
+      })
+      this.$toast('提交审核成功！')
     },
     // 售后
-    afterSales () {
-      console.log('售后')
+    afterSales (orderSn) {
+      this.$router.push({
+        path: '/shopOrder/afterSales',
+        query: {
+          orderSn: orderSn
+        }
+      })
     }
   }
 }

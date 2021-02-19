@@ -100,14 +100,26 @@
     <div class="order_detail_foot flex flex--align-items--center flex--justify-content--end">
       <div
         class="order_detail_foot_purple"
+        v-if="item.status == 1"
         @click="deliverGoods(shopOrderDetail.order_sn)"
       >发货</div>
       <!-- <div class="order_detail_foot_ash">申请退款</div> -->
       <!-- <div class="order_detail_foot_ash">查看物流</div> -->
       <div
         class="order_detail_foot_purple"
+        v-if="item.status == 2"
         @click="logistics(shopOrderDetail.order_sn)"
       >物流</div>
+      <div
+        class="order_detail_foot_purple"
+        v-if="item.status == 6"
+        @click="refund(shopOrderDetail.order_sn)"
+      >同意退款</div>
+      <div
+        class="order_detail_foot_purple"
+        v-if="item.status == 10"
+        @click="afterSales(shopOrderDetail.order_sn)"
+      >售后</div>
       <!-- <div class="order_detail_foot_purple">去支付</div> -->
       <!-- <div class="order_detail_foot_purple">确认收货</div> -->
     </div>
@@ -115,7 +127,7 @@
 </template>
 
 <script>
-import { getShopOrderDetail } from '@/api/shopOrder'
+import { getShopOrderDetail, getOrderRefund } from '@/api/shopOrder'
 export default {
   name: 'OrderDetail',
   data () {
@@ -198,12 +210,40 @@ export default {
       this.shopOrderDetail = data.response_data
     },
     // 发货
-    deliverGoods (orderOn) {
-      console.log('发货')
+    deliverGoods (orderSn) {
+      this.$router.push({
+        path: '/shopOrder/deliverGoods',
+        query: {
+          orderSn: orderSn
+        }
+      })
     },
     // 物流
-    logistics (orderOn) {
-      console.log('物流')
+    logistics (orderSn) {
+      this.$router.push({
+        path: '/order/viewLog',
+        query: {
+          orderSn: orderSn
+        }
+      })
+    },
+    // 退款
+    async refund (orderSn) {
+      await getOrderRefund({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        order_sn: orderSn,
+        type: 1
+      })
+      this.$toast('提交审核成功！')
+    },
+    // 售后
+    afterSales (orderSn) {
+      this.$router.push({
+        path: '/shopOrder/afterSales',
+        query: {
+          orderSn: orderSn
+        }
+      })
     }
   }
 }
