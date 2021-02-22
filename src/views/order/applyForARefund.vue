@@ -19,6 +19,27 @@
         placeholder="请输入店铺简介，不超过200字"
       />
     </div>
+    <!-- 上传图片 -->
+    <div
+      class="refund_imgs flex flex--wrap"
+      v-if="type == 3"
+    >
+      <van-image
+        class="refund_imgs_list"
+        v-for="(img, index) in imageArr"
+        :key="index"
+        :src="img"
+        fit="cover"
+      />
+      <img
+        src="../../../static/formal/shangchuantupian.png"
+        alt=""
+        @click="onChangeFile"
+        v-if="imageArr.length < 9"
+      />
+      <input type="file" hidden ref="file" @change="onFileChange"/>
+    </div>
+
     <div class="refund_btn">
       <van-button type="primary" color="#949CDF" block @click="setSubmit">提交</van-button>
     </div>
@@ -38,7 +59,7 @@
 </template>
 
 <script>
-import { getReason, getUpdateStatus } from '@/api/order'
+import { getReason, getUpdateStatus, getHome } from '@/api/order'
 export default {
   name: 'applyForARefund',
   data () {
@@ -50,7 +71,9 @@ export default {
       descIndex: 0,
       columns: [],
       columnsId: [],
-      show: false
+      show: false,
+      imageArr: [],
+      newImageArr: []
     }
   },
   created () {
@@ -116,12 +139,45 @@ export default {
         order_sn: this.orderSn,
         status: status,
         reason: this.columns[this.descIndex],
-        reason_desc: this.message
+        reason_desc: this.message,
+        reason_imgs: this.newImageArr.join(',')
       })
+      if (data.status === 0) {
+        this.$toast(data.error_msg)
+        return
+      }
       this.$toast(data.msg)
       setTimeout(() => {
         this.$router.go(-1)
       }, 1500)
+    },
+    // onChangeFile
+    onChangeFile () {
+      this.$refs.file.click()
+    },
+    // onFileChange
+    async onFileChange () {
+      if (this.imageArr.length >= 9) {
+        this.$toast('1111')
+        return
+      }
+      const url = window.URL.createObjectURL(this.$refs.file.files[0])
+      this.imageArr.push(url)
+      const res = await new Promise((resolve, reject) => {
+        const readers = new FileReader()
+        readers.readAsDataURL(this.$refs.file.files[0])
+        readers.onload = function () {
+          resolve(readers)
+        }
+        readers.onerror = reject
+      })
+      const { data } = await getHome({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        file: res.result
+      })
+      this.newImageArr.push(data.response_data.url)
+      console.log(this.imageArr)
+      console.log(this.newImageArr)
     }
   }
 }
@@ -169,11 +225,28 @@ export default {
       }
     }
     .refund_btn{
-      padding: 0 16px;
-      position: fixed;
-      bottom: 109px;
-      left: 0;
-      right: 0;
+      padding: 20px 16px;
+      // position: fixed;
+      // bottom: 109px;
+      // left: 0;
+      // right: 0;
+    }
+    .refund_imgs{
+      padding: 0 15px;
+      .refund_imgs_list{
+        width: 108px;
+        height: 108px;
+        margin-right: 10px;
+        margin-top: 10px;
+      }
+      .refund_imgs_list:nth-child(3n+3){
+        margin-right: 0;
+      }
+      img{
+        width: 108px;
+        height: 108px;
+        margin-top: 10px;
+      }
     }
   }
 </style>

@@ -27,6 +27,7 @@
       class="coupon_list flex flex--align-items--center flex--justify-content--space-between"
       v-for="(item, index) in newCouponList"
       :key="index"
+      @click="selectYouHui(item.id, item.price)"
     >
       <div class="coupon_list_price flex flex--align-items--end">
         <p>
@@ -52,10 +53,14 @@ export default {
   data () {
     return {
       couponList: [], // 优惠券列表
-      newCouponList: [] // 领取之后数据的列表
+      newCouponList: [], // 领取之后数据的列表
+      token: '',
+      type: 0
     }
   },
   created () {
+    this.token = this.$route.query.token
+    this.type = this.$route.query.type
     this.getCouponList()
   },
   filters: {
@@ -84,7 +89,7 @@ export default {
   methods: {
     async getCouponList () {
       const { data } = await getCouponList({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82'
+        token: this.token
       })
       if (data.status === 1) {
         data.response_data.forEach((v) => {
@@ -102,12 +107,29 @@ export default {
     // 立即领取
     async setReceive (id) {
       const { data } = await receiveCouponList({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         id: id
       })
       this.couponList = []
       this.$toast(data.msg)
       this.getCouponList()
+    },
+    selectYouHui (id, price) {
+      const data = {
+        id: id,
+        freight: parseFloat(price)
+      }
+      if (this.type !== '1') {
+        return
+      }
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.selectYouHui(JSON.stringify(data))
+        window.androidJs.goback()
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.selectYouHui.postMessage(JSON.stringify(data))
+        window.webkit.messageHandlers.goback.postMessage({})
+      }
     }
   }
 }

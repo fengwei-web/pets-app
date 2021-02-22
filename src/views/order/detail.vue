@@ -136,6 +136,7 @@
       <div
         class="order_detail_foot_purple"
         v-if="detailsObj.status == 0"
+        @click="toZhiFu(detailsObj.p_order_sn, detailsObj.p_true_price)"
       >去支付</div>
       <div
         class="order_detail_foot_purple"
@@ -153,11 +154,13 @@ export default {
   data () {
     return {
       orderSn: '',
+      token: '',
       detailsObj: null
     }
   },
   created () {
     this.orderSn = this.$route.query.orderSn
+    this.token = this.$route.query.token
     this.getOrderDetails()
   },
   filters: {
@@ -222,7 +225,7 @@ export default {
   methods: {
     async getOrderDetails () {
       const { data } = await getDetail({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: this.orderSn
       })
       this.detailsObj = data.response_data[0]
@@ -246,6 +249,19 @@ export default {
           orderSn: orderSn
         }
       })
+    },
+    // 去付款
+    toZhiFu (orderSn, price) {
+      const param = {
+        order_sn: orderSn,
+        true_price: price
+      }
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.toZhiFu(JSON.stringify(param))
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.toZhiFu.postMessage(JSON.stringify(param))
+      }
     }
   }
 }

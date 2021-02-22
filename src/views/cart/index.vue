@@ -6,7 +6,10 @@
         v-for="(item,index) in cartList"
         :key="index"
       >
-        <div class="cart_con_list_head flex flex--align-items--center">
+        <div
+          class="cart_con_list_head flex flex--align-items--center"
+          @click="godianpu(item.shop_info.shop_id)"
+        >
           <img src="" alt="">
           <van-image :src="item.shop_info.shop_logo"></van-image>
           <h3>{{ item.shop_info.shop_name }}</h3>
@@ -26,8 +29,11 @@
               <i class="icon iconfont icondanxuanxuanzhong" v-if="!shop.show"></i>
               <i class="icon iconfont iconxuanzhong--" style="color: #949CDF;" v-else></i>
             </div>
-            <div class="cart_con_list_box_term_big flex flex--align-items--center">
-               <van-image :src="shop.cover" @click="deletes(shop.id, index)"/>
+            <div
+              class="cart_con_list_box_term_big flex flex--align-items--center"
+              @click="goDetail(shop.pet_id)"
+            >
+               <van-image :src="shop.cover"/>
                <div class="cart_con_list_box_term_big_rig">
                  <h3>{{ shop.name }}</h3>
                  <p>{{ shop.age }}</p>
@@ -50,7 +56,18 @@
           ￥{{ total }}
         </div>
       </div>
-      <van-button class="cart_foot_btn" type="info" @click="goSettlement">去结算</van-button>
+      <van-button
+        class="cart_foot_btn"
+        type="info"
+        @click="goSettlement()"
+        v-if="!isFlog"
+      >去结算</van-button>
+      <van-button
+        class="cart_foot_btn"
+        type="info"
+        @click="deletes"
+        v-else
+      >删除</van-button>
     </div>
   </div>
 </template>
@@ -62,16 +79,22 @@ export default {
   data () {
     return {
       isShow: false,
+      isFlog: false,
       page: 1,
       limit: 10,
       cartList: [], // 购物车列表
       allcount: 0,
       checkarr: [],
-      total: '0.00'
+      total: '0.00',
+      token: ''
     }
   },
   created () {
+    this.token = this.$route.query.token
     this.getCartList()
+  },
+  mounted () {
+    window.ifFootState = this.ifFootState
   },
   watch: {
     checkarr (newvalue) {
@@ -89,7 +112,7 @@ export default {
     // 获取购物车数据
     async getCartList () {
       const { data } = await getShoppingList({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         page: this.page,
         limit: this.limit
       })
@@ -112,17 +135,21 @@ export default {
       this.checkarr.splice(index, 1)
     },
     // 删除
-    async deletes (id, index) {
+    async deletes (index) {
       const { data } = await delShopping({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
-        ids: id
+        token: this.token,
+        ids: this.checkarr.join(',')
       })
       if (data.status === 1) {
         this.$toast('删除成功')
-        this.cartList.splice(index, 1)
+        this.getCartList()
       } else {
         this.$toast(data.error_msg)
       }
+    },
+    // 编辑
+    ifFootState () {
+      this.isFlog = !this.isFlog
     },
     // 全选
     selectAll () {
@@ -149,8 +176,33 @@ export default {
       })
       this.total = totalPrice.toFixed(2)
     },
+    // 去店铺
+    godianpu (id) {
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goDianpu(parseInt(id))
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goDianpu.postMessage(parseInt(id))
+      }
+    },
+    // 去详情
+    goDetail (id) {
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goodInfo(parseInt(id))
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goodInfo.postMessage(parseInt(id))
+      }
+    },
     // 去结算
-    goSettlement () {}
+    goSettlement () {
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.submitOrder(this.checkarr.join(','))
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.submitOrder.postMessage(this.checkarr.join(','))
+      }
+    }
   }
 }
 </script>

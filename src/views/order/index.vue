@@ -20,6 +20,7 @@
           v-for="msg in item"
           :key="msg.id"
           :items="msg"
+          :token="token"
           @confirmReceiving = "confirmReceiving"
         ></orderList>
       </div>
@@ -56,17 +57,19 @@ export default {
           title: '待收货'
         },
         {
-          title: '待评价 '
+          title: '已完成'
         }
       ],
       tabIndex: 0, // 当前tab下标
       status: null,
       page: 1,
       limit: 10,
-      orderList: []
+      orderList: [],
+      token: ''
     }
   },
   created () {
+    this.token = this.$route.query.token
     // 获取订单列表数据
     this.getOrderList()
   },
@@ -98,7 +101,7 @@ export default {
     // 获取列表数据
     async getOrderList () {
       const { data } = await getOrderLists({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         status: this.status,
         page: this.page,
         limit: this.limit

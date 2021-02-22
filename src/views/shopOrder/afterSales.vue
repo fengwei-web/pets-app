@@ -7,7 +7,7 @@
     <div v-if="detailObj.remark != null && detailObj.imgs.length > 0">
       <h3 class="after_remarks">备注</h3>
       <p class="after_reason">{{ detailObj.remark }}</p>
-      <div class="after_imgs flex flex--wrap flex--justify-content--center">
+      <div class="after_imgs flex flex--wrap">
         <van-image
           v-for="(img, index) in detailObj.reason_imgs"
           :key="index"
@@ -94,8 +94,8 @@ export default {
     .after_imgs{
       padding-top: 30px;
       .van-image{
-        width: 94px;
-        height: 94px;
+        width: 108px;
+        height: 108px;
         margin: 0 10px 10px 0;
       }
       .van-image:nth-child(3n+3){

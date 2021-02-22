@@ -44,7 +44,7 @@ export const getDetail = data => {
 export const getWriteOrder = data => {
   return request({
     method: 'POST',
-    url: '/Shop/write_order',
+    url: '/Shop/write_order_unify',
     data
   })
 }
@@ -53,7 +53,25 @@ export const getWriteOrder = data => {
 export const getCommitOrder = data => {
   return request({
     method: 'POST',
-    url: '/Shop/commit_order',
+    url: '/Shop/commit_order_unify',
+    data
+  })
+}
+
+// 文件上传
+export const getHome = data => {
+  return request({
+    method: 'POST',
+    url: '/Home/upload_file',
+    data
+  })
+}
+
+// 文件上传
+export const getExpres = data => {
+  return request({
+    method: 'POST',
+    url: '/Shoporder/get_express',
     data
   })
 }

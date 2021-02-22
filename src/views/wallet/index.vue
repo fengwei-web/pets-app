@@ -6,7 +6,7 @@
           <i class="icon iconfont iconzuobian"></i>
         </div>
         <h3>钱包</h3>
-        <van-button class="wallet_head_title_btn" round>提现</van-button>
+        <van-button class="wallet_head_title_btn" round @click="setWallet">提现</van-button>
       </div>
       <div class="wallet_head_box flex flex--align-items--center flex--justify-content--space-between">
         <div class="wallet_head_box_list flex flex--row flex--align-items--center flex--justify-content--space-between">
@@ -61,7 +61,17 @@
 
 <script>
 export default {
-  name: 'wallet'
+  name: 'wallet',
+  methods: {
+    setWallet () {
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goTiXian()
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goTiXian.postMessage({})
+      }
+    }
+  }
 }
 </script>
 

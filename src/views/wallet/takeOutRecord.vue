@@ -22,12 +22,16 @@ export default {
   name: 'takeOutRecord',
   data () {
     return {
+      token: '',
+      type: '',
       page: 1, // 页数
       limit: 10, // 每页大小
       takeOutList: [] // 提现记录数据
     }
   },
   created () {
+    this.token = this.$route.query.token
+    this.type = this.$route.query.desc
     // 获取提现明细数据
     this.getWithdrawalRecord()
   },
@@ -35,7 +39,8 @@ export default {
     // 获取提现明细数据
     async getWithdrawalRecord () {
       const parame = {
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
+        type: this.type,
         page: this.page,
         limit: this.limit
       }

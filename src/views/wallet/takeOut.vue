@@ -15,7 +15,7 @@
         </div>
         <van-button
           class="takeOut_box_list_btn"
-          :to="'/wallet/shopTakeOut?money=' + userInfo.shop_balance + '&desc=1'"
+          @click="shopTakeOut(userInfo.shop_balance, 1)"
           slot="default"
         >提现</van-button>
       </div>
@@ -26,7 +26,7 @@
         </div>
         <van-button
           class="takeOut_box_list_btn"
-          :to="'/wallet/shopTakeOut?money=' + userInfo.send_balance + '&desc=2'"
+          @click="shopTakeOut(userInfo.send_balance, 2)"
           slot="default"
         >提现</van-button>
       </div>
@@ -40,18 +40,32 @@ export default {
   name: 'takeOut',
   data () {
     return {
-      userInfo: {} // 用户个人信息
+      userInfo: {}, // 用户个人信息
+      token: ''
     }
   },
   created () {
+    this.token = this.$route.query.token
     // 获取用户个人信息
     this.getUserInfo()
   },
   methods: {
     // 获取用户个人信息
     async getUserInfo () {
-      const { data } = await myDetail({ token: '5748c39c8381ad3fd323ba55283cc809cfbebf82' })
+      const { data } = await myDetail({ token: this.token })
       this.userInfo = data.response_data
+    },
+    shopTakeOut (money, desc) {
+      const param = {
+        money: money,
+        desc: desc
+      }
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goTiXianInfo(JSON.stringify(param))
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goTiXianInfo.postMessage(JSON.stringify(param))
+      }
     }
   }
 }

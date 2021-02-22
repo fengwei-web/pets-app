@@ -63,8 +63,27 @@
 </template>
 
 <script>
+import { getExpres } from '@/api/order'
 export default {
-  name: 'viewLogistics'
+  name: 'viewLogistics',
+  data () {
+    return {
+
+    }
+  },
+  created () {
+    this.orderSn = this.$route.query.orderSn
+    this.getViewLogistics()
+  },
+  methods: {
+    async getViewLogistics () {
+      const { data } = await getExpres({
+        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        order_sn: this.orderSn
+      })
+      console.log(data)
+    }
+  }
 }
 </script>
 

@@ -46,6 +46,7 @@ export default {
     return {
       money: '', // 可提现金额
       desc: 1, // 提现类型
+      token: '',
       type: 0, // 提现方式
       amount: '' // 提现金额
     }
@@ -57,6 +58,7 @@ export default {
   methods: {
     // 获取参数
     getData () {
+      this.token = this.$route.query.token
       this.money = this.$route.query.money
       this.desc = this.$route.query.desc
     },
@@ -70,8 +72,12 @@ export default {
     },
     // 提交
     async setSubmit () {
-      if (!this.amount) {
+      if (this.amount === '') {
         this.$toast('请输入金额！')
+        return
+      }
+      if (parseFloat(this.amount) <= 0) {
+        this.$toast('金额必须大于0')
         return
       }
       if (parseFloat(this.amount) > parseFloat(this.money)) {
@@ -83,14 +89,18 @@ export default {
         return
       }
       const parame = {
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         desc: this.desc,
         type: this.type,
         amount: this.amount
       }
       const { data } = await withdrawDeposit(parame)
-      this.$toast(data.msg)
-      setTimeout(() => this.$router.go(-1), 1500)
+      if (data.status === 0) {
+        this.$toast(data.error_msg)
+        return
+      }
+      this.$toast('提现成功')
+      setTimeout(() => this.$router.go(-1), 1000)
     }
   }
 }

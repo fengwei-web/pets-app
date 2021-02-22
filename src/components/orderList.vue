@@ -37,7 +37,7 @@
         v-if="type == 'order'"
       >
         <div class="order_list_foot_term" @click="goRefund(1, items.p_order_sn)">取消订单</div>
-        <div class="order_list_foot_term">去付款</div>
+        <div class="order_list_foot_term" @click="toZhiFu(items.p_order_sn, items.p_true_price)">去付款</div>
       </div>
       <div
         class="order_list_foot flex flex--align-items--center flex--justify-content--end"
@@ -85,16 +85,6 @@
         v-if="type == 'order'"
       >
         <div
-          class="order_detail_foot_ash"
-          v-if="items.status == 0"
-          @click="goRefund(1, items.order_sn)"
-        >取消订单</div>
-        <div
-          class="order_list_foot_term"
-          v-if="items.status == 1"
-          @click="goRefund(2, items.order_sn)"
-        >申请退款</div>
-        <div
           class="order_list_foot_term"
           v-if="items.status == 2"
           @click="seeLogistics(items.order_sn)"
@@ -109,10 +99,6 @@
           v-if="items.status == 2"
           @click="confirmReceiving(items.order_sn)"
         >确认收货</div>
-        <div
-          class="order_list_foot_term"
-          v-if="items.status == 3"
-        >去评价</div>
       </div>
       <div
         class="order_list_foot flex flex--align-items--center flex--justify-content--end"
@@ -138,6 +124,10 @@ export default {
     items: {
       type: Object,
       default: null
+    },
+    token: {
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -194,7 +184,7 @@ export default {
     // 确认收货
     async confirmReceiving (orderSn) {
       const { data } = await getConfirmReceiving({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: orderSn
       })
       if (data.status === 1) {
@@ -216,12 +206,12 @@ export default {
     },
     // 进入详情
     goDetail (orderSn) {
-      this.$router.push({
-        path: '/order/detail',
-        query: {
-          orderSn: orderSn
-        }
-      })
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goOrderInfo(orderSn)
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goOrderInfo.postMessage(orderSn)
+      }
     },
     // 查看物流
     seeLogistics (orderSn) {
@@ -231,6 +221,19 @@ export default {
           orderSn: orderSn
         }
       })
+    },
+    // 去付款
+    toZhiFu (orderSn, price) {
+      const param = {
+        order_sn: orderSn,
+        true_price: price
+      }
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.toZhiFu(JSON.stringify(param))
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.toZhiFu.postMessage(JSON.stringify(param))
+      }
     }
   }
 }
@@ -249,8 +252,8 @@ export default {
       border-bottom: 1px solid #eee;
       .order_list_head_left{
         .van-image{
-          width: 12px;
-          height: 12px;
+          width: 18px;
+          height: 18px;
           margin-left: 5px;
         }
         p{

@@ -1,7 +1,10 @@
 <template>
   <div class="submit flex flex--row">
     <div class="submit_con">
-      <div class="submit_con_address">
+      <div
+        class="submit_con_address"
+        @click="setAddress"
+      >
         <div
           class="submit_con_address_yes flex flex--align-items--center flex--justify-content--space-between"
           v-if="submitDetail.address_info.id !== 0"
@@ -33,7 +36,10 @@
           v-for="(submit, key) in submitDetail.c_order_lists"
           :key="key"
         >
-          <div class="info_shop_head flex flex--align-items--center">
+          <div
+            class="info_shop_head flex flex--align-items--center"
+            v-if="submit.shop_info.shop_id != 0"
+          >
             <img :src="submit.shop_info.shop_logo" alt="">
             <h3>{{ submit.shop_info.shop_name }}</h3>
           </div>
@@ -92,24 +98,63 @@ export default {
   data () {
     return {
       message: '',
-      submitDetail: null
+      submitDetail: null,
+      parameter: {
+        token: '',
+        order_type: 1,
+        shopping_ids: '',
+        pet_id: '',
+        distribution_way_id: 0,
+        distribution_way_freight: ''
+      }
     }
   },
   created () {
-    this.getWriteOrderDetail()
+    this.getData()
+  },
+  mounted () {
+    // 获取地址
+    window.getAddress = this.getAddress
   },
   methods: {
+    getData () {
+      this.parameter.token = this.$route.query.token
+      this.parameter.type = this.$route.query.type
+      this.parameter.order_type = this.$route.query.order_type
+      if (this.parameter.type === '1') {
+        this.parameter.shopping_ids = this.$route.query.shopping_ids
+      } else {
+        this.parameter.pet_id = this.$route.query.pet_id
+        this.parameter.distribution_way_id = this.$route.query.distribution_way_id
+        this.parameter.distribution_way_freight = this.$route.query.distribution_way_freight
+      }
+      this.getWriteOrderDetail()
+    },
+    // 第一步
     async getWriteOrderDetail () {
       const { data } = await getWriteOrder({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
-        type: 2,
+        token: this.parameter.token,
+        order_type: this.parameter.order_type,
+        type: this.parameter.type,
         // type=1 必填
-        shopping_ids: '',
+        shopping_ids: this.parameter.shopping_ids,
         // type=2 必填
-        pet_id: '4',
-        distribution_way_id: 1,
-        distribution_way_freight: 0
+        pet_id: this.parameter.pet_id,
+        distribution_way_id: this.parameter.distribution_way_id,
+        distribution_way_freight: this.parameter.distribution_way_freight
       })
+      if (data.status === 0) {
+        this.$toast(data.error_msg)
+        setTimeout(() => {
+          const sn = navigator.userAgent.toLowerCase()
+          if (sn.indexOf('android') !== -1) {
+            window.androidJs.goback()
+          } else if (sn.indexOf('iphone') !== -1) {
+            window.webkit.messageHandlers.goback.postMessage()
+          }
+        }, 1500)
+        return
+      }
       this.submitDetail = data.response_data
     },
     // 提交订单
@@ -120,25 +165,46 @@ export default {
       }
       const address = this.submitDetail.address_info
       const { data } = await getCommitOrder({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
-        type: 2,
-        shopping_ids: '',
-        pet_id: 4,
+        token: this.parameter.token,
+        order_type: this.parameter.order_type,
+        type: this.parameter.type,
+        shopping_ids: this.parameter.shopping_ids,
+        pet_id: this.parameter.pet_id,
         address_name: address.consignee_name,
         address_phone: address.consignee_phone,
         address: address.address,
         remark: this.message,
-        distribution_way_id: 1,
-        distribution_way_freight: 0
+        distribution_way_id: this.parameter.distribution_way_id,
+        distribution_way_freight: this.parameter.distribution_way_freight
       })
-
-      this.$router.push({
-        path: '/order/payment',
-        query: {
-          orderSn: data.response_data.order_sn,
-          truePrice: data.response_data.true_price
-        }
-      })
+      if (data.status === 0) {
+        this.$toast(data.error_msg)
+        return
+      }
+      const param = {
+        order_sn: data.response_data.order_sn,
+        true_price: data.response_data.true_price
+      }
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.toZhiFu(JSON.stringify(param))
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.toZhiFu.postMessage(JSON.stringify(param))
+      }
+    },
+    // 选择地址
+    setAddress () {
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.selectAddress()
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.selectAddress.postMessage({})
+      }
+    },
+    // 获取安卓传来的地址
+    getAddress (str) {
+      this.submitDetail.address_info = JSON.parse(str)
+      this.$forceUpdate()
     }
   }
 }
@@ -206,6 +272,7 @@ export default {
       box-sizing: border-box;
       .info_shop{
         margin-top: 10px;
+        padding-top: 10px;
         padding-bottom: 31px;
         .info_shop_head{
           padding: 15px 0;
