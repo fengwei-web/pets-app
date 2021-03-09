@@ -7,7 +7,7 @@ module.exports = {
     open: true, // 是否自动弹出浏览器页面
     https: false, // 是否使用https协议
     hotOnly: false, // 是否开启热更新
-    host: '192.168.3.123',
+    host: 'localhost',
     port: 8080,
     proxy: {
       '/api': {

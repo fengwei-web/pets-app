@@ -79,10 +79,12 @@ export default {
       massage: '',
       page: 1,
       limit: 10,
+      token: '',
       shopOrderLists: ''
     }
   },
   created () {
+    this.token = this.$route.query.token
     this.getShopOrderList()
   },
   filters: {
@@ -136,7 +138,7 @@ export default {
     // 获取列表数据
     async getShopOrderList () {
       const { data } = await getShopOrderLists({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         keywords: this.massage,
         page: this.page,
         limit: this.limit
@@ -145,12 +147,12 @@ export default {
     },
     // 查看 进入详情
     goDetails (orderSn) {
-      this.$router.push({
-        path: '/shopOrder/detail',
-        query: {
-          orderSn: orderSn
-        }
-      })
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goShopOrderInfo(orderSn)
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goShopOrderInfo.postMessage(orderSn)
+      }
     },
     // 监听到底事件
     listScroll ($event) {
@@ -169,26 +171,26 @@ export default {
     }, 200),
     // 发货
     deliverGoods (orderSn) {
-      this.$router.push({
-        path: '/shopOrder/deliverGoods',
-        query: {
-          orderSn: orderSn
-        }
-      })
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.toFaHuo(orderSn)
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.toFaHuo.postMessage(orderSn)
+      }
     },
     // 物流
     logistics (orderSn) {
-      this.$router.push({
-        path: '/order/viewLog',
-        query: {
-          orderSn: orderSn
-        }
-      })
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goWuLiu(orderSn)
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goWuLiu.postMessage(orderSn)
+      }
     },
     // 退款
     async refund (orderSn) {
       await getOrderRefund({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: orderSn,
         type: 1
       })
@@ -196,12 +198,12 @@ export default {
     },
     // 售后
     afterSales (orderSn) {
-      this.$router.push({
-        path: '/shopOrder/afterSales',
-        query: {
-          orderSn: orderSn
-        }
-      })
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goShouHou(orderSn)
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goShouHou.postMessage(orderSn)
+      }
     }
   }
 }

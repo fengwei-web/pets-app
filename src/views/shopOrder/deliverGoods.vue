@@ -35,18 +35,20 @@ export default {
       columns: [],
       columnsText: '请选择',
       message: '',
-      orderSn: ''
+      orderSn: '',
+      token: ''
     }
   },
   created () {
     this.orderSn = this.$route.query.orderSn
+    this.token = this.$route.query.token
     this.getExpressLists()
   },
   methods: {
     // 获取快递公司列表
     async getExpressLists () {
       const { data } = await getExpressList({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82'
+        token: this.token
       })
       data.response_data.forEach(v => {
         this.columns.push(v.title)
@@ -68,7 +70,7 @@ export default {
         return
       }
       const { data } = await getOrderSend({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: this.orderSn,
         express_name: this.columnsText,
         express_num: this.message
@@ -78,6 +80,14 @@ export default {
         return
       }
       this.$toast(data.msg)
+      setTimeout(() => {
+        const sn = navigator.userAgent.toLowerCase()
+        if (sn.indexOf('android') !== -1) {
+          window.androidJs.goback()
+        } else if (sn.indexOf('iphone') !== -1) {
+          window.webkit.messageHandlers.goback.postMessage()
+        }
+      }, 1000)
     }
   }
 }

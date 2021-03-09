@@ -50,7 +50,7 @@
               :key="index"
             >
               <div class="info_shop_box_list_left">
-                <van-image :src="item.cover"></van-image>
+                <van-image :src="item.cover" fit="cover"></van-image>
               </div>
               <div class="info_shop_box_list_right">
                 <h3>{{ item.name }}</h3>
@@ -177,15 +177,27 @@ export default {
         distribution_way_id: this.parameter.distribution_way_id,
         distribution_way_freight: this.parameter.distribution_way_freight
       })
-      if (data.status === 0) {
-        this.$toast(data.error_msg)
-        return
-      }
+      const sn = navigator.userAgent.toLowerCase()
       const param = {
         order_sn: data.response_data.order_sn,
         true_price: data.response_data.true_price
       }
-      const sn = navigator.userAgent.toLowerCase()
+      if (data.status === 0) {
+        this.$toast(data.error_msg)
+        return
+      }
+      if (data.response_data.is_pay === 1) {
+        this.$toast(data.msg)
+        setTimeout(() => {
+          if (sn.indexOf('android') !== -1) {
+            window.androidJs.goback()
+          } else if (sn.indexOf('iphone') !== -1) {
+            window.webkit.messageHandlers.goback.postMessage()
+          }
+        }, 1000)
+        return
+      }
+
       if (sn.indexOf('android') !== -1) {
         window.androidJs.toZhiFu(JSON.stringify(param))
       } else if (sn.indexOf('iphone') !== -1) {

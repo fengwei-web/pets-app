@@ -97,27 +97,30 @@
         />
       </div>
     </div>
-    <div class="order_detail_foot flex flex--align-items--center flex--justify-content--end">
+    <div
+      class="order_detail_foot flex flex--align-items--center flex--justify-content--end"
+      v-if="shopOrderDetail.status !== 0"
+    >
       <div
         class="order_detail_foot_purple"
-        v-if="item.status == 1"
+        v-if="shopOrderDetail.status == 1"
         @click="deliverGoods(shopOrderDetail.order_sn)"
       >发货</div>
       <!-- <div class="order_detail_foot_ash">申请退款</div> -->
       <!-- <div class="order_detail_foot_ash">查看物流</div> -->
       <div
         class="order_detail_foot_purple"
-        v-if="item.status == 2"
+        v-if="shopOrderDetail.status == 2"
         @click="logistics(shopOrderDetail.order_sn)"
       >物流</div>
       <div
         class="order_detail_foot_purple"
-        v-if="item.status == 6"
+        v-if="shopOrderDetail.status == 6"
         @click="refund(shopOrderDetail.order_sn)"
       >同意退款</div>
       <div
         class="order_detail_foot_purple"
-        v-if="item.status == 10"
+        v-if="shopOrderDetail.status == 10"
         @click="afterSales(shopOrderDetail.order_sn)"
       >售后</div>
       <!-- <div class="order_detail_foot_purple">去支付</div> -->
@@ -133,11 +136,13 @@ export default {
   data () {
     return {
       orderSn: '',
+      token: '',
       shopOrderDetail: null
     }
   },
   created () {
     this.orderSn = this.$route.query.orderSn
+    this.token = this.$route.query.token
     this.getShopOrderDetail()
   },
   filters: {
@@ -203,34 +208,34 @@ export default {
     // 获取订单详情数据
     async getShopOrderDetail () {
       const { data } = await getShopOrderDetail({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: this.orderSn
       })
-      console.log(data)
       this.shopOrderDetail = data.response_data
+      console.log(this.shopOrderDetail)
     },
     // 发货
     deliverGoods (orderSn) {
-      this.$router.push({
-        path: '/shopOrder/deliverGoods',
-        query: {
-          orderSn: orderSn
-        }
-      })
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.toFaHuo(orderSn)
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.toFaHuo.postMessage(orderSn)
+      }
     },
     // 物流
     logistics (orderSn) {
-      this.$router.push({
-        path: '/order/viewLog',
-        query: {
-          orderSn: orderSn
-        }
-      })
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goWuLiu(orderSn)
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goWuLiu.postMessage(orderSn)
+      }
     },
     // 退款
     async refund (orderSn) {
       await getOrderRefund({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: orderSn,
         type: 1
       })
@@ -238,12 +243,12 @@ export default {
     },
     // 售后
     afterSales (orderSn) {
-      this.$router.push({
-        path: '/shopOrder/afterSales',
-        query: {
-          orderSn: orderSn
-        }
-      })
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goShouHou(orderSn)
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goShouHou.postMessage(orderSn)
+      }
     }
   }
 }

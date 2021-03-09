@@ -91,6 +91,11 @@
         >查看物流</div>
         <div
           class="order_list_foot_term"
+          v-if="items.status == 1"
+          @click="goRefund(2, detailsObj.order_sn)"
+        >申请退款</div>
+        <div
+          class="order_list_foot_term"
           v-if="items.status == 2"
           @click="goRefund(3, items.order_sn)"
         >申请售后</div>
@@ -196,13 +201,16 @@ export default {
     },
     // 取消订单/订单退款/订单售后
     goRefund (type, orderSn) {
-      this.$router.push({
-        path: '/order/refund',
-        query: {
-          type: type,
-          orderSn: orderSn
-        }
-      })
+      const data = {
+        type: type,
+        orderSn: orderSn
+      }
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goRefund(JSON.stringify(data))
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goRefund.postMessage(JSON.stringify(data))
+      }
     },
     // 进入详情
     goDetail (orderSn) {
@@ -215,12 +223,12 @@ export default {
     },
     // 查看物流
     seeLogistics (orderSn) {
-      this.$router.push({
-        path: '/order/viewLog',
-        query: {
-          orderSn: orderSn
-        }
-      })
+      const sn = navigator.userAgent.toLowerCase()
+      if (sn.indexOf('android') !== -1) {
+        window.androidJs.goWuLiu(orderSn)
+      } else if (sn.indexOf('iphone') !== -1) {
+        window.webkit.messageHandlers.goWuLiu.postMessage(orderSn)
+      }
     },
     // 去付款
     toZhiFu (orderSn, price) {

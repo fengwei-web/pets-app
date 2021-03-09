@@ -30,18 +30,20 @@ export default {
   data () {
     return {
       orderSn: '',
+      token: '',
       detailObj: null
     }
   },
   created () {
     this.orderSn = this.$route.query.orderSn
+    this.token = this.$route.query.token
     this.getShopOrderDetails()
   },
   methods: {
     // 商家详情
     async getShopOrderDetails () {
       const { data } = await getShopOrderDetail({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: this.orderSn
       })
       this.detailObj = data.response_data
@@ -49,7 +51,7 @@ export default {
     // 是否同意
     async isAgree (type) {
       const { data } = await getOrderAftersale({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: this.orderSn,
         type: type
       })

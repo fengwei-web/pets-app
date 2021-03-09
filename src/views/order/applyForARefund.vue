@@ -67,6 +67,7 @@ export default {
       message: '',
       type: 1,
       orderSn: '',
+      token: '',
       desc: '请选择原因',
       descIndex: 0,
       columns: [],
@@ -79,6 +80,7 @@ export default {
   created () {
     this.type = this.$route.query.type
     this.orderSn = this.$route.query.orderSn
+    this.token = this.$route.query.token
     // 获取原因数据
     this.getReasonList()
   },
@@ -102,7 +104,7 @@ export default {
     // 获取原因数据
     async getReasonList () {
       const { data } = await getReason({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         type: this.type
       })
       data.response_data.forEach(element => {
@@ -135,7 +137,7 @@ export default {
           break
       }
       const { data } = await getUpdateStatus({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: this.orderSn,
         status: status,
         reason: this.columns[this.descIndex],
@@ -148,7 +150,13 @@ export default {
       }
       this.$toast(data.msg)
       setTimeout(() => {
-        this.$router.go(-1)
+        // this.$router.go(-1)
+        const sn = navigator.userAgent.toLowerCase()
+        if (sn.indexOf('android') !== -1) {
+          window.androidJs.goback()
+        } else if (sn.indexOf('iphone') !== -1) {
+          window.webkit.messageHandlers.goback.postMessage({})
+        }
       }, 1500)
     },
     // onChangeFile
@@ -158,7 +166,6 @@ export default {
     // onFileChange
     async onFileChange () {
       if (this.imageArr.length >= 9) {
-        this.$toast('1111')
         return
       }
       const url = window.URL.createObjectURL(this.$refs.file.files[0])
@@ -172,12 +179,10 @@ export default {
         readers.onerror = reject
       })
       const { data } = await getHome({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         file: res.result
       })
       this.newImageArr.push(data.response_data.url)
-      console.log(this.imageArr)
-      console.log(this.newImageArr)
     }
   }
 }

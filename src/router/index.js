@@ -6,7 +6,13 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    redirect: '/order'
+    redirect: '/video'
+  },
+  // 视频
+  {
+    path: '/video',
+    name: 'video',
+    component: () => import('../views/video')
   },
   // 用户订单列表
   {

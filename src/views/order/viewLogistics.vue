@@ -1,50 +1,22 @@
 <template>
   <div class="viewLog">
     <div class="viewLog_info">
-      <van-cell :border="false" title="运输公司" value="顺丰速运" />
-      <van-cell :border="false" title="订单编号" value="1341652131567461563132" />
-      <van-cell :border="false" title="订单状态" value="已取货" />
-      <van-cell :border="false" title="官方电话" value="9532" />
+      <van-cell :border="false" title="运输公司" :value="viewLog.order_info.express_name" />
+      <van-cell :border="false" title="订单编号" :value="viewLog.order_info.express_num" />
+      <van-cell :border="false" title="订单状态" :value="viewLog.order_info.status | setStatus" />
+      <!-- <van-cell :border="false" title="官方电话" value="9532" /> -->
     </div>
 
     <div class="viewLog_step">
       <van-steps
         direction="vertical"
-        :active="1"
       >
-        <van-step>
-          <h3>包裹正在等待揽收</h3>
-          <p>2019-05-06 10:30:12</p>
-          <div
-            class="viewLog_step_select flex flex--align-items--center flex--justify-content--center"
-            slot="active-icon"
-          >
-            <p></p>
-          </div>
-          <div class="viewLog_step_no_select flex flex--align-items--center flex--justify-content--center"
-            slot="inactive-icon"
-          >
-            <p></p>
-          </div>
-        </van-step>
-        <van-step>
-          <h3>您的包裹已出库</h3>
-          <p>2019-05-06 10:30:12</p>
-          <div
-            class="viewLog_step_select flex flex--align-items--center flex--justify-content--center"
-            slot="active-icon"
-          >
-            <p></p>
-          </div>
-          <div class="viewLog_step_no_select flex flex--align-items--center flex--justify-content--center"
-            slot="inactive-icon"
-          >
-            <p></p>
-          </div>
-        </van-step>
-        <van-step>
-          <h3>您的订单开始处理</h3>
-          <p>2019-05-06 10:30:12</p>
+        <van-step
+          v-for="(item, index) in viewLog.lists"
+          :key="index"
+        >
+          <h3>{{ item.context }}</h3>
+          <p>{{ item.ftime }}</p>
           <div
             class="viewLog_step_select flex flex--align-items--center flex--justify-content--center"
             slot="active-icon"
@@ -68,20 +40,70 @@ export default {
   name: 'viewLogistics',
   data () {
     return {
-
+      orderSn: '',
+      token: '',
+      viewLog: null
     }
   },
   created () {
     this.orderSn = this.$route.query.orderSn
+    this.token = this.$route.query.token
     this.getViewLogistics()
+  },
+  filters: {
+    setStatus (val) {
+      let str = ''
+      switch (val) {
+        case 0:
+          str = '待付款'
+          break
+        case 1:
+          str = '待发货'
+          break
+        case 2:
+          str = '待收货'
+          break
+        case 3:
+          str = '已完成'
+          break
+        case 5:
+          str = '已取消'
+          break
+        case 6:
+          str = '申请退款'
+          break
+        case 7:
+          str = '同意退款'
+          break
+        case 8:
+          str = '完成退款'
+          break
+        case 9:
+          str = '商家拒绝退款'
+          break
+        case 10:
+          str = '申请售后'
+          break
+        case 11:
+          str = '售后同意退款'
+          break
+        case 12:
+          str = '售后完成退款'
+          break
+        case 13:
+          str = '商家拒绝售后退款'
+          break
+      }
+      return str
+    }
   },
   methods: {
     async getViewLogistics () {
       const { data } = await getExpres({
-        token: '5748c39c8381ad3fd323ba55283cc809cfbebf82',
+        token: this.token,
         order_sn: this.orderSn
       })
-      console.log(data)
+      this.viewLog = data.response_data
     }
   }
 }

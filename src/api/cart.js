@@ -15,3 +15,11 @@ export const delShopping = data => {
     data
   })
 }
+
+export const videoDetail = data => {
+  return request({
+    method: 'POST',
+    url: '/Video/details',
+    data
+  })
+}
