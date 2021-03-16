@@ -14,6 +14,12 @@ const routes = [
     name: 'video',
     component: () => import('../views/video')
   },
+  // 分享
+  {
+    path: '/share',
+    name: 'share',
+    component: () => import('../views/share')
+  },
   // 用户订单列表
   {
     path: '/order',
