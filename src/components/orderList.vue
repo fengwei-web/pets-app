@@ -4,10 +4,11 @@
       <div
         class="order_list_head flex flex--align-items--center flex--justify-content--space-between"
       >
-        <div class="order_list_head_left flex flex--align-items--center">
+        <div class="order_list_head_left flex flex--align-items--center" v-if="items.type == 1">
           <van-image :src="items.shop_logo" />
           <p>{{ items.shop_name }}</p>
         </div>
+        <div class="order_list_head_title" v-else>领养送样</div>
         <span>{{ items.status | status }}</span>
       </div>
 
@@ -52,10 +53,11 @@
       <div
         class="order_list_head flex flex--align-items--center flex--justify-content--space-between"
       >
-        <div class="order_list_head_left flex flex--align-items--center">
+        <div class="order_list_head_left flex flex--align-items--center" v-if="items.type == 1">
           <van-image :src="items.shop_logo" />
           <p>{{ items.shop_name }}</p>
         </div>
+        <div class="order_list_head_title" v-else>领养送样</div>
         <span>{{ items.status | status }}</span>
       </div>
 
@@ -91,12 +93,12 @@
         >查看物流</div>
         <div
           class="order_list_foot_term"
-          v-if="items.status == 1"
+          v-if="items.type == 1 && items.status == 1"
           @click="goRefund(2, detailsObj.order_sn)"
         >申请退款</div>
         <div
           class="order_list_foot_term"
-          v-if="items.status == 2"
+          v-if="items.type == 1 && items.status == 2"
           @click="goRefund(3, items.order_sn)"
         >申请售后</div>
         <div
@@ -269,6 +271,10 @@ export default {
           color: #333;
           margin-left: 10px;
         }
+      }
+      .order_list_head_title{
+        font-size: 13px;
+        color: #949CDF;
       }
       span{
         font-size: 13px;

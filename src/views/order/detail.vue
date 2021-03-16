@@ -120,7 +120,7 @@
       >取消订单</div>
       <div
         class="order_detail_foot_ash"
-        v-if="detailsObj.status == 1"
+        v-if="detailsObj.type == 1 && detailsObj.status == 1"
         @click="goRefund(2, detailsObj.order_sn)"
       >申请退款</div>
       <div
@@ -130,7 +130,7 @@
       >查看物流</div>
       <div
         class="order_detail_foot_ash"
-        v-if="detailsObj.status == 2"
+        v-if="detailsObj.type == 1 && detailsObj.status == 2"
         @click="goRefund(3, detailsObj.order_sn)"
       >申请售后</div>
       <div
