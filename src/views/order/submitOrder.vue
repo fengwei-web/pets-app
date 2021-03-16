@@ -150,7 +150,7 @@ export default {
           if (sn.indexOf('android') !== -1) {
             window.androidJs.goback()
           } else if (sn.indexOf('iphone') !== -1) {
-            window.webkit.messageHandlers.goback.postMessage()
+            window.webkit.messageHandlers.goback.postMessage({})
           }
         }, 1500)
         return
