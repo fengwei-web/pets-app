@@ -27,11 +27,17 @@
         <i class="icon iconfont iconyoubianxiaojiantou"></i>
       </div>
       <div class="order_detail_shop">
-        <div class="order_list_head flex flex--align-items--center flex--justify-content--space-between">
-          <div class="order_list_head_left flex flex--align-items--center">
+        <div
+          class="order_list_head flex flex--align-items--center flex--justify-content--space-between"
+        >
+          <div
+            class="order_list_head_left flex flex--align-items--center"
+            v-if="detailsObj.type == 1"
+          >
             <van-image :src="detailsObj.shop_logo" />
             <p>{{ detailsObj.shop_name }}</p>
           </div>
+          <div class="order_list_head_title" v-else>领养送养</div>
           <!-- <span>待付款</span> -->
         </div>
         <div class="order_list_box">
@@ -360,7 +366,7 @@ export default {
             margin-left: 10px;
           }
         }
-        span{
+        .order_list_head_title {
           font-size: 13px;
           color: #949CDF;
         }

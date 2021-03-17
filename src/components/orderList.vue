@@ -8,7 +8,7 @@
           <van-image :src="items.shop_logo" />
           <p>{{ items.shop_name }}</p>
         </div>
-        <div class="order_list_head_title" v-else>领养送样</div>
+        <div class="order_list_head_title" v-else>领养送养</div>
         <span>{{ items.status | status }}</span>
       </div>
 
@@ -57,7 +57,7 @@
           <van-image :src="items.shop_logo" />
           <p>{{ items.shop_name }}</p>
         </div>
-        <div class="order_list_head_title" v-else>领养送样</div>
+        <div class="order_list_head_title" v-else>领养送养</div>
         <span>{{ items.status | status }}</span>
       </div>
 
