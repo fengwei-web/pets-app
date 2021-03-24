@@ -6,7 +6,13 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    redirect: '/video'
+    redirect: '/privacy'
+  },
+  // 隐私政策
+  {
+    path: '/privacy',
+    name: 'privacy',
+    component: () => import('../views/privacy')
   },
   // 视频
   {

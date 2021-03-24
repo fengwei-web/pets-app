@@ -5,10 +5,11 @@
       v-for="(item, index) in couponList"
       :key="index"
     >
-      <div class="coupon_list_price flex flex--align-items--end">
+      <div class="coupon_list_price flex flex--row flex--align-items--center flex--justify-content--center">
         <p>
-          <b>¥</b>{{ item.price | price1 }}<b>.{{ item.price | price2 }}</b>
+          <b>¥</b>{{ item.price | price1 }}
         </p>
+        <span>优惠券</span>
       </div>
       <div class="coupon_list_info flex flex--row">
         <h3>{{ item.name }}</h3>
@@ -29,10 +30,11 @@
       :key="index"
       @click="selectYouHui(item.id, item.price)"
     >
-      <div class="coupon_list_price flex flex--align-items--end">
+      <div class="coupon_list_price flex flex--row flex--align-items--center flex--justify-content--center">
         <p>
-          <b>¥</b>{{ item.price | price1 }}<b>.{{ item.price | price2 }}</b>
+          <b>¥</b>{{ item.price | price1 }}
         </p>
+        <span>优惠券</span>
       </div>
       <div class="coupon_list_info flex flex--row">
         <h3>{{ item.name }}</h3>
@@ -119,16 +121,19 @@ export default {
         id: id,
         freight: parseFloat(price)
       }
-      if (this.type !== '1') {
-        return
-      }
-      const sn = navigator.userAgent.toLowerCase()
-      if (sn.indexOf('android') !== -1) {
-        window.androidJs.selectYouHui(JSON.stringify(data))
-        window.androidJs.goback()
-      } else if (sn.indexOf('iphone') !== -1) {
-        window.webkit.messageHandlers.selectYouHui.postMessage(JSON.stringify(data))
-        window.webkit.messageHandlers.goback.postMessage({})
+      if (this.type === '1' || this.type === '2') {
+        const sn = navigator.userAgent.toLowerCase()
+        if (sn.indexOf('android') !== -1) {
+          window.androidJs.selectYouHui(JSON.stringify(data))
+          if (this.type === '1') {
+            window.androidJs.goback()
+          }
+        } else if (sn.indexOf('iphone') !== -1) {
+          window.webkit.messageHandlers.selectYouHui.postMessage(JSON.stringify(data))
+          if (this.type === '1') {
+            window.webkit.messageHandlers.goback.postMessage({})
+          }
+        }
       }
     }
   }
@@ -139,18 +144,22 @@ export default {
 .coupon {
   height: 100%;
   padding: 0 18px;
-  background: #fff;
+  // background: #fff;
   overflow-y: auto;
   .coupon_list {
     height: 96px;
-    border: 2px solid #000;
+    // border: 2px solid #000;
     padding: 0 10px;
     margin-bottom: 11px;
+    background: url('../../../static/formal/coupon.png') no-repeat;
+    background-size: 100% 100%;
     &:last-of-type {
       margin-bottom: 0;
     }
     .coupon_list_price {
-      color: #f7b500;
+      width: 85px;
+      color: #EE5158;
+      border-right: 1px dashed #DCDFE4;
       p {
         font-size: 33px;
         font-weight: bold;
@@ -160,6 +169,10 @@ export default {
             font-size: 18px;
           }
         }
+      }
+      span {
+        font-size: 16px;
+        color: #EE5158;
       }
     }
     .coupon_list_info {
@@ -177,13 +190,13 @@ export default {
     }
     .coupon_list_state {
       // width: 54px;
-      height: 21px;
-      background: #95e2f4;
+      height: 28px;
+      background: #F34E67;
       border: none;
       /deep/ .van-button__content {
         span {
           font-size: 12px;
-          color: #333;
+          color: #fff;
         }
       }
     }
