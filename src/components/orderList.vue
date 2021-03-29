@@ -94,7 +94,7 @@
         <div
           class="order_list_foot_term"
           v-if="items.type == 1 && items.status == 1"
-          @click="goRefund(2, detailsObj.order_sn)"
+          @click="goRefund(2, items.order_sn)"
         >申请退款</div>
         <div
           class="order_list_foot_term"

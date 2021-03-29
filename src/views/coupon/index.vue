@@ -79,7 +79,7 @@ export default {
           str = '立即领取'
           break
         case 1:
-          str = '未使用'
+          str = '去使用'
           break
         case 2:
           str = '已过期'
