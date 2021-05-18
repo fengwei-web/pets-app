@@ -77,7 +77,7 @@
         </div>
       </div>
     </div>
-
+    <div class="submit_gou" @click="goGouChongXieYi">购宠协议</div>
     <div class="submit_foot flex flex--align-items--center flex--justify-content--space-between">
       <div class="submit_foot_left flex flex--align-items--end">
         ￥{{ submitDetail.order_info.true_price }}
@@ -156,6 +156,9 @@ export default {
         return
       }
       this.submitDetail = data.response_data
+    },
+    goGouChongXieYi () {
+      this.$router.push('/index')
     },
     // 提交订单
     async submitOrder () {
@@ -360,6 +363,12 @@ export default {
         margin-top: 10px;
       }
     }
+  }
+  .submit_gou {
+    text-align: center;
+    font-size: 13px;
+    color: #333;
+    padding: 20px 0;
   }
   .submit_foot{
     height: 50px;

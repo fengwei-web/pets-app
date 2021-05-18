@@ -133,6 +133,12 @@ const routes = [
     path: '/wallet/shopTakeOut',
     name: 'shopTakeOut',
     component: () => import('../views/wallet/shopTakeOut')
+  },
+  // 购宠协议
+  {
+    path: '/gouChong',
+    name: 'gouChong',
+    component: () => import('../views/gouChong')
   }
 ]
 
